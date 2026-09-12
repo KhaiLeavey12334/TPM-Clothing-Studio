@@ -2,7 +2,7 @@ Config = Config or {}
 
 Config.Debug = true
 Config.ResourceName = 'TPM Clothing Studio'
-Config.Version = '0.0.3-alpha'
+Config.Version = '0.0.4-alpha'
 
 Config.Commands = {
     openStudio = 'tpmstudio',
