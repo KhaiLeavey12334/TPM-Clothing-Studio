@@ -4,9 +4,9 @@ TPM Clothing Studio is a FiveM developer toolkit for previewing custom clothing,
 
 ## Current Version
 
-`0.0.1-alpha`
+`0.0.2-alpha`
 
-Alpha 0.0.1 establishes the production framework:
+Alpha 0.0.2 includes the production framework and the first camera system:
 
 - FiveM `fxmanifest.lua`
 - Lua 5.4 resource configuration
@@ -16,6 +16,10 @@ Alpha 0.0.1 establishes the production framework:
 - Modular client folders
 - Server bootstrap
 - NUI shell
+- Scripted camera
+- Camera presets
+- Zoom and rotation helpers
+- Smooth camera transitions
 
 ## Install
 
@@ -28,6 +32,7 @@ ensure tpm_clothing_studio
 ```
 
 4. Start the server and use `/tpmstudio` in-game.
+5. Use `/tpmcamera` to toggle the current scripted preview camera.
 
 ## Roadmap
 
