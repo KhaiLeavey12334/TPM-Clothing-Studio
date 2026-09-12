@@ -3,6 +3,7 @@ Studio = Studio or {}
 Studio.name = Config.ResourceName
 Studio.version = Config.Version
 Studio.modules = Studio.modules or {}
+Studio.startedModules = Studio.startedModules or {}
 Studio.state = Studio.state or {
     nuiVisible = Config.Nui.defaultVisible,
     activeModule = nil
