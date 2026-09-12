@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.3-alpha
+
+- Added clothing component browser state.
+- Added prop browser state.
+- Added drawable and texture stepping.
+- Added collection state support.
+- Added NUI clothing state publishing.
+- Added quick test commands for drawable and texture navigation.
+
 ## 0.0.2-alpha
 
 - Added scripted camera creation and teardown.
