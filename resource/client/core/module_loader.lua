@@ -28,10 +28,15 @@ function Studio.ModuleLoader.Start(name)
         return false
     end
 
+    if Studio.startedModules[name] then
+        return true
+    end
+
     if hasLifecycle(module, 'Start') then
         module.Start()
     end
 
+    Studio.startedModules[name] = true
     Studio.SetState('activeModule', name)
     Studio.Logger.Info(('Started module "%s".'):format(name))
     return true
