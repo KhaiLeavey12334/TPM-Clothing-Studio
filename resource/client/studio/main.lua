@@ -6,5 +6,6 @@ end
 
 CreateThread(function()
     Studio.ModuleLoader.Register('studio', Studio.App)
-    Studio.ModuleLoader.Start('studio')
+    Wait(0)
+    Studio.ModuleLoader.StartAll()
 end)
