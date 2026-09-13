@@ -2,7 +2,7 @@ Config = Config or {}
 
 Config.Debug = true
 Config.ResourceName = 'TPM Clothing Studio'
-Config.Version = '0.0.5-alpha'
+Config.Version = '0.0.6-alpha'
 
 Config.Commands = {
     openStudio = 'tpmstudio',
@@ -11,7 +11,10 @@ Config.Commands = {
     previousDrawable = 'tpmprevdrawable',
     nextTexture = 'tpmnexttexture',
     previousTexture = 'tpmprevtexture',
-    screenshot = 'tpmscreenshot'
+    screenshot = 'tpmscreenshot',
+    autoPreview = 'tpmautopreview',
+    pauseAutoPreview = 'tpmpausepreview',
+    resumeAutoPreview = 'tpmresumepreview'
 }
 
 Config.Nui = {
@@ -109,4 +112,13 @@ Config.Screenshot = {
     uploadUrl = '',
     encoding = 'jpg',
     quality = 0.95
+}
+
+Config.AutoPreview = {
+    enabled = true,
+    captureDelayMs = 700,
+    betweenItemsMs = 250,
+    cameraPreset = 'fullBody',
+    includeTextures = true,
+    maxItemsPerRun = 0
 }
