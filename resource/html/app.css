@@ -174,7 +174,8 @@ button.is-active {
 .stepper-row,
 .browser-grid,
 .metric-grid,
-.settings-list {
+.settings-list,
+.screenshot-panel {
     display: grid;
     gap: 14px;
 }
@@ -219,4 +220,9 @@ select {
 
 .settings-list {
     max-width: 520px;
+}
+
+#filenameMetric {
+    overflow-wrap: anywhere;
+    font-size: 18px;
 }
