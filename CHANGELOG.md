@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.0.4-alpha
+
+- Added Browser, Studio, Screenshot, and Settings NUI pages.
+- Added modern dark studio layout.
+- Added NUI controls for component, prop, drawable, and texture browsing.
+- Added live clothing state display.
+
 ## 0.0.3-alpha
 
 - Added clothing component browser state.
