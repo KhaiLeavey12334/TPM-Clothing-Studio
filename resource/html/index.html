@@ -8,12 +8,20 @@
     </head>
     <body>
         <main class="app" data-visible="false">
+            <section id="bootLoader" class="boot-loader" data-visible="false">
+                <div class="boot-loader__panel">
+                    <span class="brand__mark">TPM</span>
+                    <h2>Preparing Clothing Studio</h2>
+                    <p id="bootLoaderText">Loading player profile...</p>
+                    <progress id="bootLoaderProgress" max="100" value="0"></progress>
+                </div>
+            </section>
             <aside class="sidebar">
                 <div class="brand">
                     <span class="brand__mark">TPM</span>
                     <div>
                         <h1>Clothing Studio</h1>
-                        <p>Beta 0.1.1</p>
+                        <p>Beta 0.1.2</p>
                     </div>
                 </div>
                 <section class="ped-card">
@@ -136,6 +144,7 @@
                             <h3>How to use</h3>
                             <p>Open the studio with F1 or /tpmstudio. Use Browser to choose a clothing component or prop, then move through drawables and textures with the buttons or number fields.</p>
                             <p>Use Screenshot to capture the current item. Screenshots are saved with structured names so they are ready for catalogues and Discord previews.</p>
+                            <p>Screenshots save inside this resource at screenshots/ when screenshot-basic writes them. On a normal install, that is resources/tpm_clothing_studio/screenshots.</p>
                             <p>Use Studio to run Auto Screenshot. Enter the first drawable, then the last drawable. TPM Clothing Studio captures every texture for every drawable in that range.</p>
                             <p>Use Ped Chooser to switch between Male, Female, or detected ped resources. Ped scanning is configured in config.lua under Config.Peds. By default, ped resources should be placed in resources/[peds].</p>
                             <p>Esc cancels active work and closes the UI. F13 is the default manual screenshot key and can be changed in Settings or FiveM key bindings.</p>

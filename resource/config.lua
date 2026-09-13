@@ -3,7 +3,7 @@ Config = Config or {}
 -- Enable only while developing the resource. Leave false for normal server use.
 Config.Debug = false
 Config.ResourceName = 'TPM Clothing Studio'
-Config.Version = 'Beta 0.1.1'
+Config.Version = 'Beta 0.1.2'
 
 Config.Commands = {
     openStudio = 'tpmstudio',

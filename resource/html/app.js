@@ -1,4 +1,7 @@
 const app = document.querySelector('.app');
+const bootLoader = document.querySelector('#bootLoader');
+const bootLoaderText = document.querySelector('#bootLoaderText');
+const bootLoaderProgress = document.querySelector('#bootLoaderProgress');
 const closeButton = document.querySelector('#closeButton');
 const fullscreenButton = document.querySelector('#fullscreenButton');
 const windowedButton = document.querySelector('#windowedButton');
@@ -53,8 +56,19 @@ let toastTimer = 0;
 let packName = localStorage.getItem('tpmPackName') || '';
 let activePackLabel = 'Base GTA';
 let rangeStart = 0;
+let bootComplete = false;
+let bootRunning = false;
 let currentClothingState = { drawableCount: 0, textureCount: 0 };
 let autoState = { active: false, paused: false, total: 0, completed: 0 };
+const bootSteps = [
+    'Loading player profile...',
+    'Matching freemode body data...',
+    'Indexing drawable slots...',
+    'Preparing texture scanner...',
+    'Syncing screenshot queue...',
+    'Calibrating studio camera...',
+    'Finalising TPM interface...'
+];
 
 function audioTone(kind = 'press') {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -208,7 +222,48 @@ function setFullscreen(enabled) {
 
 function setVisible(visible) {
     app.dataset.visible = String(visible);
-    if (visible) audioTone('open');
+    if (!visible) {
+        bootLoader.dataset.visible = 'false';
+        app.classList.remove('is-booting');
+        return;
+    }
+
+    if (bootComplete) {
+        audioTone('open');
+        return;
+    }
+
+    runBootLoader();
+}
+
+function runBootLoader() {
+    if (bootRunning) return;
+
+    bootRunning = true;
+    app.classList.add('is-booting');
+    bootLoader.dataset.visible = 'true';
+    bootLoaderProgress.value = 0;
+    bootLoaderText.textContent = bootSteps[0];
+
+    const startedAt = Date.now();
+    const duration = 3000;
+    const timer = window.setInterval(() => {
+        const elapsed = Date.now() - startedAt;
+        const percent = Math.min(100, Math.floor((elapsed / duration) * 100));
+        const stepIndex = Math.min(bootSteps.length - 1, Math.floor((percent / 100) * bootSteps.length));
+
+        bootLoaderProgress.value = percent;
+        bootLoaderText.textContent = bootSteps[stepIndex];
+
+        if (percent >= 100) {
+            window.clearInterval(timer);
+            bootComplete = true;
+            bootRunning = false;
+            bootLoader.dataset.visible = 'false';
+            app.classList.remove('is-booting');
+            audioTone('open');
+        }
+    }, 80);
 }
 
 function openRangeModal() {

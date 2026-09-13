@@ -46,7 +46,8 @@ select {
     display: none;
     grid-template-columns: 260px 1fr;
     width: min(1180px, calc(100vw - 96px));
-    height: min(700px, calc(100vh - 96px));
+    height: auto;
+    max-height: calc(100vh - 96px);
     margin: 28px;
     overflow: hidden;
     border: 1px solid var(--border);
@@ -68,7 +69,47 @@ select {
 .app.is-fullscreen {
     width: calc(100vw - 28px);
     height: calc(100vh - 28px);
+    max-height: calc(100vh - 28px);
     margin: 14px;
+}
+
+.app.is-booting {
+    display: block;
+    width: min(520px, calc(100vw - 80px));
+    min-height: 0;
+}
+
+.app.is-booting .sidebar,
+.app.is-booting .workspace,
+.app.is-booting .toast,
+.app.is-booting .modal {
+    display: none;
+}
+
+.boot-loader {
+    display: none;
+    padding: 26px;
+}
+
+.boot-loader[data-visible="true"] {
+    display: block;
+}
+
+.boot-loader__panel {
+    display: grid;
+    gap: 12px;
+    padding: 20px;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    background: rgb(7 12 20 / 84%);
+}
+
+.boot-loader__panel .brand__mark {
+    font-size: 42px;
+}
+
+.boot-loader__panel h2 {
+    font-size: 24px;
 }
 
 .sidebar {
@@ -90,12 +131,12 @@ select {
 
 .brand__mark {
     display: inline-block;
-    background: linear-gradient(105deg, #16e7ff 0%, #39ff78 28%, #fff35a 48%, #ff45d0 70%, #8f5cff 100%);
+    background: linear-gradient(105deg, #00eaff 0%, #00ff66 27%, #fff200 48%, #ff18c8 70%, #7b35ff 100%);
     background-clip: text;
     color: transparent;
     -webkit-background-clip: text;
     -webkit-text-stroke: 1px #ffffff;
-    filter: drop-shadow(0 0 9px rgb(56 216 255 / 40%)) drop-shadow(0 0 12px rgb(255 78 205 / 25%));
+    filter: drop-shadow(0 0 7px rgb(56 216 255 / 25%)) drop-shadow(0 0 9px rgb(255 78 205 / 16%));
     font-size: 34px;
     font-family: "Segoe Script", "Brush Script MT", cursive;
     font-weight: 900;
@@ -254,7 +295,7 @@ select {
 
 .page {
     display: none;
-    min-height: 0;
+    min-height: 360px;
     padding: 28px;
     overflow: auto;
 }

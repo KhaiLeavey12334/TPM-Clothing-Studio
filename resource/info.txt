@@ -2,14 +2,16 @@ TPM Clothing Studio
 
 For support contact @el_legion on Discord.
 
-TPM Clothing Studio is a FiveM clothing preview and screenshot toolkit. It is built for server owners, clothing creators, and catalogue makers who need to preview drawables, textures, peds, and clothing packs quickly inside FiveM.
+TPM Clothing Studio Beta 0.1.2 is a FiveM clothing preview and screenshot toolkit. It is built for server owners, clothing creators, and catalogue makers who need to preview drawables, textures, peds, and clothing packs quickly inside FiveM.
 
 Quick start:
-1. Ensure screenshot-basic.
-2. Ensure tpm_clothing_studio.
+1. Put screenshot-basic and tpm_clothing_studio in your resources folder as separate resources.
+2. Ensure screenshot-basic before tpm_clothing_studio.
 3. Open the studio with F1 or /tpmstudio.
 4. Use Browser to select components, props, drawables, and textures.
 5. Use Screenshot for one image or Studio for automatic range captures.
+
+Do not place screenshot-basic inside the tpm_clothing_studio folder. They should sit next to each other as separate resources.
 
 Auto Screenshot:
 Enter the drawable number to start at, then enter the drawable number to end at. The studio captures every texture for each drawable in that range.
@@ -23,7 +25,10 @@ F13 - Manual screenshot
 Esc - Close and cancel active work
 
 Screenshots:
-Screenshots are saved by screenshot-basic with structured names such as:
+Screenshots are saved by screenshot-basic in:
+resources/tpm_clothing_studio/screenshots
+
+They use structured names such as:
 component_011_000_000.jpg
 
 If a pack name is saved in Settings, it is added as a prefix:
