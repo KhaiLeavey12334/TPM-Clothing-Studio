@@ -175,7 +175,9 @@ button.is-active {
 .browser-grid,
 .metric-grid,
 .settings-list,
-.screenshot-panel {
+.screenshot-panel,
+.auto-panel,
+.auto-actions {
     display: grid;
     gap: 14px;
 }
@@ -188,6 +190,20 @@ button.is-active {
 .browser-grid,
 .metric-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.auto-panel {
+    margin-bottom: 20px;
+}
+
+.auto-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+progress {
+    width: 100%;
+    height: 12px;
+    accent-color: #5ee0c2;
 }
 
 label,
