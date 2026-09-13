@@ -11,6 +11,7 @@ const selectionLabel = document.querySelector('#selectionLabel');
 const drawableMetric = document.querySelector('#drawableMetric');
 const textureMetric = document.querySelector('#textureMetric');
 const collectionMetric = document.querySelector('#collectionMetric');
+const filenameMetric = document.querySelector('#filenameMetric');
 
 const slots = {
     component: [
@@ -93,6 +94,7 @@ function updateState(state) {
     drawableMetric.textContent = `${state.drawable} / ${Math.max(0, state.drawableCount - 1)}`;
     textureMetric.textContent = `${state.texture} / ${Math.max(0, state.textureCount - 1)}`;
     collectionMetric.textContent = state.collection;
+    filenameMetric.textContent = `${state.mode}_${String(state.mode === 'prop' ? state.propId : state.componentId).padStart(3, '0')}_${String(state.drawable).padStart(3, '0')}_${String(state.texture).padStart(3, '0')}.jpg`;
 }
 
 function setMode(mode) {
