@@ -12,6 +12,9 @@ const drawableMetric = document.querySelector('#drawableMetric');
 const textureMetric = document.querySelector('#textureMetric');
 const collectionMetric = document.querySelector('#collectionMetric');
 const filenameMetric = document.querySelector('#filenameMetric');
+const autoMetric = document.querySelector('#autoMetric');
+const etaMetric = document.querySelector('#etaMetric');
+const autoProgress = document.querySelector('#autoProgress');
 
 const slots = {
     component: [
@@ -97,6 +100,27 @@ function updateState(state) {
     filenameMetric.textContent = `${state.mode}_${String(state.mode === 'prop' ? state.propId : state.componentId).padStart(3, '0')}_${String(state.drawable).padStart(3, '0')}_${String(state.texture).padStart(3, '0')}.jpg`;
 }
 
+function formatEta(seconds) {
+    if (!Number.isFinite(seconds) || seconds <= 0) {
+        return '--';
+    }
+
+    const minutes = Math.floor(seconds / 60);
+    const remainder = seconds % 60;
+
+    return `${minutes}m ${remainder}s`;
+}
+
+function updateAutoPreview(state) {
+    const total = Math.max(1, state.total || 0);
+    const completed = state.completed || 0;
+    const percent = Math.floor((completed / total) * 100);
+
+    autoProgress.value = percent;
+    autoMetric.textContent = state.active ? `${completed} / ${state.total}` : 'Idle';
+    etaMetric.textContent = state.paused ? 'Paused' : formatEta(state.etaSeconds);
+}
+
 function setMode(mode) {
     fillSlots(mode);
 
@@ -113,6 +137,10 @@ window.addEventListener('message', (event) => {
 
     if (event.data?.type === 'clothing:state') {
         updateState(event.data.payload);
+    }
+
+    if (event.data?.type === 'autoPreview:state') {
+        updateAutoPreview(event.data.payload);
     }
 });
 
@@ -133,6 +161,12 @@ document.querySelectorAll('[data-step]').forEach((button) => {
 
         input.value = Number(input.value) + delta;
         postNui(eventName, { [field]: Number(input.value) });
+    });
+});
+
+document.querySelectorAll('[data-auto]').forEach((button) => {
+    button.addEventListener('click', () => {
+        postNui(`autoPreview:${button.dataset.auto}`);
     });
 });
 
