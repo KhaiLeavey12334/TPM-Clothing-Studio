@@ -4,9 +4,9 @@ TPM Clothing Studio is a FiveM developer toolkit for previewing custom clothing,
 
 ## Current Version
 
-`0.0.3-alpha`
+`0.0.4-alpha`
 
-Alpha 0.0.3 includes the production framework, the first camera system, and the clothing engine:
+Alpha 0.0.4 includes the production framework, the first camera system, the clothing engine, and the first full NUI:
 
 - FiveM `fxmanifest.lua`
 - Lua 5.4 resource configuration
@@ -23,6 +23,9 @@ Alpha 0.0.3 includes the production framework, the first camera system, and the 
 - Component and prop browser state
 - Drawable and texture browser helpers
 - Collection-aware shared clothing state
+- Browser, Studio, Screenshot, and Settings pages
+- Modern dark NUI
+- NUI controls for browsing clothing variations
 
 ## Install
 
