@@ -100,6 +100,14 @@ function Studio.Clothing.GetState()
     return state
 end
 
+function Studio.Clothing.GetDrawableCount()
+    return getDrawableCount()
+end
+
+function Studio.Clothing.GetTextureCount()
+    return getTextureCount()
+end
+
 function Studio.Clothing.SetComponent(componentId)
     state.mode = 'component'
     state.componentId = componentId
