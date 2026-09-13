@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.6-alpha
+
+- Added Auto Preview command flow.
+- Added automatic drawable and texture cycling.
+- Added automatic screenshot capture during Auto Preview.
+- Added progress and ETA state.
+- Added pause and resume controls.
+
 ## 0.0.5-alpha
 
 - Added F13 screenshot key mapping.
