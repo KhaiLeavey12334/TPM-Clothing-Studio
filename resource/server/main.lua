@@ -1,7 +1,121 @@
 local resourceName = GetCurrentResourceName()
+local screenshotDirectory = GetResourcePath(resourceName) .. '/screenshots'
+local resourceRoot = GetResourcePath(resourceName):gsub('\\', '/'):gsub('/[^/]+$', '')
+
+local function ensureScreenshotDirectory()
+    os.execute(('mkdir "%s" 2>nul'):format(screenshotDirectory:gsub('/', '\\')))
+end
+
+local function basename(path)
+    local normalized = path:gsub('\\', '/')
+
+    return normalized:match('([^/]+)$') or 'screenshot.jpg'
+end
 
 CreateThread(function()
+    ensureScreenshotDirectory()
     print(('[TPM Clothing Studio] Server booted for resource "%s".'):format(resourceName))
+end)
+
+local function normalizePackId(name)
+    return tostring(name or ''):gsub('[^%w%-_]', '_'):lower()
+end
+
+local function commandLines(command)
+    local handle = io.popen(command)
+    local lines = {}
+
+    if not handle then
+        return lines
+    end
+
+    for line in handle:lines() do
+        lines[#lines + 1] = line
+    end
+
+    handle:close()
+    return lines
+end
+
+local function packExists(packs, id)
+    for _, pack in ipairs(packs) do
+        if pack.id == id then
+            return true
+        end
+    end
+
+    return false
+end
+
+local function addPack(packs, folderName, path)
+    local id = normalizePackId(folderName)
+
+    if id == '' or packExists(packs, id) then
+        return
+    end
+
+    packs[#packs + 1] = {
+        id = id,
+        label = folderName,
+        resource = folderName,
+        collection = folderName,
+        gender = 'any',
+        detected = true,
+        started = GetResourceState(folderName) == 'started',
+        hasStream = path and path ~= ''
+    }
+end
+
+local function discoverRegisteredClothingResources(packs)
+    local totalResources = GetNumResources()
+
+    for index = 0, totalResources - 1 do
+        local folderName = GetResourceByFindIndex(index)
+        local path = folderName and GetResourcePath(folderName)
+
+        if path then
+            local normalizedPath = path:gsub('\\', '/'):lower()
+
+            if normalizedPath:find('/[clothingpacks]/', 1, true) then
+                addPack(packs, folderName, path)
+            end
+        end
+    end
+end
+
+local function discoverClothingFolders(packs)
+    local clothingRoot = resourceRoot .. '/[clothingpacks]'
+    local command = ('dir /b /ad "%s" 2>nul'):format(clothingRoot:gsub('/', '\\'))
+
+    for _, folderName in ipairs(commandLines(command)) do
+        addPack(packs, folderName, clothingRoot .. '/' .. folderName)
+    end
+end
+
+local function discoverClothingPacks()
+    local packs = {
+        {
+            id = 'base',
+            label = 'Default / Base GTA',
+            resource = '',
+            collection = '',
+            gender = 'any',
+            detected = true,
+            started = true
+        }
+    }
+
+    discoverRegisteredClothingResources(packs)
+    discoverClothingFolders(packs)
+
+    return packs
+end
+
+RegisterNetEvent('tpm_clothing_studio:packs:request', function()
+    local packs = discoverClothingPacks()
+
+    print(('[TPM Clothing Studio] Detected %s clothing pack option(s).'):format(#packs))
+    TriggerClientEvent('tpm_clothing_studio:packs:update', source, packs)
 end)
 
 RegisterNetEvent('tpm_clothing_studio:screenshot:capture', function(filename)
@@ -12,16 +126,22 @@ RegisterNetEvent('tpm_clothing_studio:screenshot:capture', function(filename)
         return
     end
 
+    ensureScreenshotDirectory()
+
+    local outputPath = screenshotDirectory .. '/' .. basename(filename)
+
     exports['screenshot-basic']:requestClientScreenshot(playerId, {
-        fileName = filename,
+        fileName = outputPath,
         encoding = Config.Screenshot.encoding,
         quality = Config.Screenshot.quality
     }, function(error)
         if error then
             print(('[TPM Clothing Studio] Screenshot failed for %s: %s'):format(playerId, error))
+            TriggerClientEvent('tpm_clothing_studio:screenshot:result', playerId, false, tostring(error), outputPath)
             return
         end
 
-        print(('[TPM Clothing Studio] Screenshot saved for %s as "%s".'):format(playerId, filename))
+        print(('[TPM Clothing Studio] Screenshot saved for %s as "%s".'):format(playerId, outputPath))
+        TriggerClientEvent('tpm_clothing_studio:screenshot:result', playerId, true, nil, outputPath)
     end)
 end)
