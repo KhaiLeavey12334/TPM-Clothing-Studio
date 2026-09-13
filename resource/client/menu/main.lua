@@ -16,6 +16,14 @@ local function lockStudioEnvironment()
     SetWeatherTypeNowPersist(Config.Studio.weather)
 end
 
+local function movePlayerToStudio()
+    local ped = PlayerPedId()
+    local coords = Config.Studio.autoStartCoords
+
+    SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z, false, false, false)
+    SetEntityHeading(ped, coords.w)
+end
+
 function Studio.Menu.SetVisible(visible, options)
     options = options or {}
 
@@ -28,6 +36,7 @@ function Studio.Menu.SetVisible(visible, options)
 
     if visible and Studio.Clothing then
         lockStudioEnvironment()
+        movePlayerToStudio()
         TriggerServerEvent('tpm_clothing_studio:packs:request')
         TriggerServerEvent('tpm_clothing_studio:peds:request')
         Studio.Clothing.PublishState()

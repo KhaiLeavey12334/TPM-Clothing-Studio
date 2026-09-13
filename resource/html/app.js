@@ -246,7 +246,7 @@ function runBootLoader() {
     bootLoaderText.textContent = bootSteps[0];
 
     const startedAt = Date.now();
-    const duration = 3000;
+    const duration = 6000;
     const timer = window.setInterval(() => {
         const elapsed = Date.now() - startedAt;
         const percent = Math.min(100, Math.floor((elapsed / duration) * 100));

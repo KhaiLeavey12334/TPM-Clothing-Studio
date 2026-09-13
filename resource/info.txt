@@ -2,7 +2,7 @@ TPM Clothing Studio
 
 For support contact @el_legion on Discord.
 
-TPM Clothing Studio Beta 0.1.2 is a FiveM clothing preview and screenshot toolkit. It is built for server owners, clothing creators, and catalogue makers who need to preview drawables, textures, peds, and clothing packs quickly inside FiveM.
+TPM Clothing Studio Beta 0.1.3 is a FiveM clothing preview and screenshot toolkit. It is built for server owners, clothing creators, and catalogue makers who need to preview drawables, textures, peds, and clothing packs quickly inside FiveM.
 
 Quick start:
 1. Put screenshot-basic and tpm_clothing_studio in your resources folder as separate resources.
