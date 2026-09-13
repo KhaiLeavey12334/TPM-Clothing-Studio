@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.5-alpha
+
+- Added F13 screenshot key mapping.
+- Added manual screenshot command.
+- Added automatic filename formatting.
+- Added UI hiding during capture.
+- Added configurable capture delay.
+
 ## 0.0.4-alpha
 
 - Added Browser, Studio, Screenshot, and Settings NUI pages.
