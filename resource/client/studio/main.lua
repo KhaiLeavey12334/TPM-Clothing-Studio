@@ -10,7 +10,8 @@ local autoState = {
     etaSeconds = 0,
     saveLocation = '',
     error = '',
-    limit = 0
+    startDrawable = 0,
+    endDrawable = 0
 }
 
 local autoStopRequested = false
@@ -23,11 +24,13 @@ local function publishAutoState()
     })
 end
 
-local function countQueueItems()
+local function countQueueItems(startDrawable, endDrawable)
     local total = 0
     local drawableCount = Studio.Clothing.GetDrawableCount()
+    local first = math.max(0, math.min(drawableCount - 1, startDrawable or 0))
+    local last = math.max(first, math.min(drawableCount - 1, endDrawable or drawableCount - 1))
 
-    for drawable = 0, drawableCount - 1 do
+    for drawable = first, last do
         local textureCount = Config.AutoPreview.includeTextures and Studio.Clothing.GetTextureCountForDrawable(drawable) or 1
         total = total + math.max(1, textureCount)
     end
@@ -52,14 +55,20 @@ local function waitWhilePaused()
 end
 
 local function shouldStop()
-    if not autoState.active then
-        return true
-    end
+    return not autoState.active
+end
 
-    local configuredLimit = Config.AutoPreview.maxItemsPerRun > 0 and Config.AutoPreview.maxItemsPerRun or 0
-    local runLimit = autoState.limit > 0 and autoState.limit or configuredLimit
+local function prepareAutoLocation()
+    local ped = PlayerPedId()
+    local coords = Config.Studio.autoStartCoords
 
-    return runLimit > 0 and autoState.completed >= runLimit
+    DoScreenFadeOut(250)
+    Wait(300)
+    SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z, false, false, false)
+    SetEntityHeading(ped, coords.w)
+    FreezeEntityPosition(ped, true)
+    Wait(300)
+    DoScreenFadeIn(250)
 end
 
 local function captureCurrentItem()
@@ -80,13 +89,17 @@ local function captureCurrentItem()
     Wait(Config.AutoPreview.betweenItemsMs)
 end
 
-function Studio.AutoPreview.Start(limit)
+function Studio.AutoPreview.Start(startDrawable, endDrawable)
     if autoState.active then
         Studio.Logger.Warn('Auto Preview is already running.')
         return false
     end
 
-    local ok, totalOrError = pcall(countQueueItems)
+    local drawableCount = Studio.Clothing.GetDrawableCount()
+    local firstDrawable = math.max(0, math.min(drawableCount - 1, math.floor(startDrawable or 0)))
+    local lastDrawable = math.max(firstDrawable, math.min(drawableCount - 1, math.floor(endDrawable or drawableCount - 1)))
+
+    local ok, totalOrError = pcall(countQueueItems, firstDrawable, lastDrawable)
 
     if not ok then
         autoState.error = tostring(totalOrError)
@@ -101,12 +114,8 @@ function Studio.AutoPreview.Start(limit)
     autoState.completed = 0
     autoState.startedAt = GetGameTimer()
     autoState.total = totalOrError
-    if limit and limit > 0 then
-        autoState.total = math.min(autoState.total, math.floor(limit))
-        autoState.limit = math.floor(limit)
-    else
-        autoState.limit = 0
-    end
+    autoState.startDrawable = firstDrawable
+    autoState.endDrawable = lastDrawable
     autoState.etaSeconds = 0
     autoState.saveLocation = ''
     autoState.error = ''
@@ -119,9 +128,13 @@ function Studio.AutoPreview.Start(limit)
 
     CreateThread(function()
         local ok, errorMessage = pcall(function()
-            local drawableCount = Studio.Clothing.GetDrawableCount()
+            prepareAutoLocation()
 
-            for drawable = 0, drawableCount - 1 do
+            if Studio.Camera then
+                Studio.Camera.ApplyPreset(Config.AutoPreview.cameraPreset, 0)
+            end
+
+            for drawable = firstDrawable, lastDrawable do
                 if shouldStop() then break end
 
                 Studio.Clothing.SetDrawable(drawable)
@@ -150,6 +163,7 @@ function Studio.AutoPreview.Start(limit)
         local wasStopped = autoStopRequested
         autoState.active = false
         autoState.paused = false
+        FreezeEntityPosition(PlayerPedId(), false)
         if Studio.Camera then
             Studio.Camera.Destroy()
         end
@@ -197,6 +211,7 @@ function Studio.AutoPreview.Stop()
     autoStopRequested = true
     autoState.active = false
     autoState.paused = false
+    FreezeEntityPosition(PlayerPedId(), false)
     if Studio.Camera then
         Studio.Camera.Destroy()
     end

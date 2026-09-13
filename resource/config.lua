@@ -22,6 +22,13 @@ Config.Nui = {
     defaultVisible = false
 }
 
+Config.Studio = {
+    autoStartCoords = vector4(-1099.16, -484.86, 36.18, 292.26),
+    lockDayWeatherOnFirstOpen = true,
+    dayHour = 12,
+    weather = 'CLEAR'
+}
+
 Config.Logging = {
     prefix = 'TPM Clothing Studio',
     showTimestamps = true
@@ -132,4 +139,11 @@ Config.AutoPreview = {
     cameraPreset = 'fullBody',
     includeTextures = true,
     maxItemsPerRun = 0
+}
+
+Config.Peds = {
+    enabled = true,
+    scanFolder = '[peds]',
+    defaultMaleModel = 'mp_m_freemode_01',
+    defaultFemaleModel = 'mp_f_freemode_01'
 }

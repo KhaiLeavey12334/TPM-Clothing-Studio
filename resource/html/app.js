@@ -4,11 +4,8 @@ const minimizeButton = document.querySelector('#minimizeButton');
 const dockButton = document.querySelector('#dockButton');
 const dockStatus = document.querySelector('#dockStatus');
 const dockCount = document.querySelector('#dockCount');
-const dockEta = document.querySelector('#dockEta');
-const dockProgress = document.querySelector('#dockProgress');
 const fullscreenButton = document.querySelector('#fullscreenButton');
-const fullscreenToggle = document.querySelector('#fullscreenToggle');
-const themeSelect = document.querySelector('#themeSelect');
+const windowedButton = document.querySelector('#windowedButton');
 const screenshotKeySelect = document.querySelector('#screenshotKeySelect');
 const packNameInput = document.querySelector('#packNameInput');
 const savePackNameButton = document.querySelector('#savePackNameButton');
@@ -17,9 +14,10 @@ const pageTitle = document.querySelector('#pageTitle');
 const navItems = [...document.querySelectorAll('.nav__item')];
 const pages = [...document.querySelectorAll('[data-page-panel]')];
 const slotSelect = document.querySelector('#slotSelect');
-const packSelect = document.querySelector('#packSelect');
 const drawableInput = document.querySelector('#drawableInput');
 const textureInput = document.querySelector('#textureInput');
+const pedSelect = document.querySelector('#pedSelect');
+const pedApplyButton = document.querySelector('#pedApplyButton');
 const modeLabel = document.querySelector('#modeLabel');
 const selectionLabel = document.querySelector('#selectionLabel');
 const drawableMetric = document.querySelector('#drawableMetric');
@@ -28,9 +26,6 @@ const collectionMetric = document.querySelector('#collectionMetric');
 const browserDrawableCount = document.querySelector('#browserDrawableCount');
 const browserTextureCount = document.querySelector('#browserTextureCount');
 const browserPackLabel = document.querySelector('#browserPackLabel');
-const packMetric = document.querySelector('#packMetric');
-const packCollectionMetric = document.querySelector('#packCollectionMetric');
-const packResourceMetric = document.querySelector('#packResourceMetric');
 const filenameMetric = document.querySelector('#filenameMetric');
 const autoMetric = document.querySelector('#autoMetric');
 const etaMetric = document.querySelector('#etaMetric');
@@ -44,90 +39,78 @@ const toast = document.querySelector('#toast');
 const toastTitle = document.querySelector('#toastTitle');
 const toastBody = document.querySelector('#toastBody');
 const toastProgress = document.querySelector('#toastProgress');
-const limitModal = document.querySelector('#limitModal');
-const limitModalText = document.querySelector('#limitModalText');
-const limitInput = document.querySelector('#limitInput');
-const limitCancelButton = document.querySelector('#limitCancelButton');
-const limitStartButton = document.querySelector('#limitStartButton');
-const welcomeModal = document.querySelector('#welcomeModal');
-const welcomeLearnButton = document.querySelector('#welcomeLearnButton');
-const welcomeDiveButton = document.querySelector('#welcomeDiveButton');
-const welcomeUnderstoodButton = document.querySelector('#welcomeUnderstoodButton');
+const rangeModal = document.querySelector('#rangeModal');
+const rangeTitle = document.querySelector('#rangeTitle');
+const rangeBody = document.querySelector('#rangeBody');
+const rangeInput = document.querySelector('#rangeInput');
+const rangeCancelButton = document.querySelector('#rangeCancelButton');
+const rangeNextButton = document.querySelector('#rangeNextButton');
 
 const slots = {
-    component: [
-        ['0', 'Face'],
-        ['1', 'Mask'],
-        ['2', 'Hair'],
-        ['3', 'Arms'],
-        ['4', 'Legs'],
-        ['5', 'Bags'],
-        ['6', 'Shoes'],
-        ['7', 'Accessories'],
-        ['8', 'Undershirt'],
-        ['9', 'Body Armor'],
-        ['10', 'Decals'],
-        ['11', 'Tops']
-    ],
-    prop: [
-        ['0', 'Hats'],
-        ['1', 'Glasses'],
-        ['2', 'Ear Pieces'],
-        ['6', 'Watches'],
-        ['7', 'Bracelets']
-    ]
+    component: [['0', 'Face'], ['1', 'Mask'], ['2', 'Hair'], ['3', 'Arms'], ['4', 'Legs'], ['5', 'Bags'], ['6', 'Shoes'], ['7', 'Accessories'], ['8', 'Undershirt'], ['9', 'Body Armor'], ['10', 'Decals'], ['11', 'Tops']],
+    prop: [['0', 'Hats'], ['1', 'Glasses'], ['2', 'Ear Pieces'], ['6', 'Watches'], ['7', 'Bracelets']]
 };
 
 let currentMode = 'component';
 let isFullscreen = localStorage.getItem('tpmFullscreen') === 'true';
-let isMinimized = localStorage.getItem('tpmMinimized') === 'true';
 let toastTimer = 0;
-let lastSavePath = '';
 let packName = localStorage.getItem('tpmPackName') || '';
-let packs = [];
-let activePackId = 'base';
-let hasSeenWelcome = sessionStorage.getItem('tpmWelcomeSeen') === 'true';
-let currentClothingState = {
-    drawableCount: 0,
-    textureCount: 0
-};
-let autoState = {
-    active: false,
-    paused: false,
-    total: 0,
-    completed: 0
-};
+let activePackLabel = 'Base GTA';
+let rangeStart = 0;
+let currentClothingState = { drawableCount: 0, textureCount: 0 };
+let autoState = { active: false, paused: false, total: 0, completed: 0 };
 
-function playPressSound() {
+function audioTone(kind = 'press') {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
-
-    if (!AudioContext) {
-        return;
-    }
+    if (!AudioContext) return;
 
     const audio = new AudioContext();
     const oscillator = audio.createOscillator();
     const gain = audio.createGain();
+    const map = {
+        press: [520, 760, 0.08, 0.04],
+        open: [280, 620, 0.18, 0.055],
+        close: [520, 180, 0.16, 0.045],
+        done: [420, 880, 0.26, 0.07]
+    };
+    const [from, to, length, volume] = map[kind] || map.press;
 
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(520, audio.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(760, audio.currentTime + 0.045);
+    oscillator.type = kind === 'done' ? 'triangle' : 'sine';
+    oscillator.frequency.setValueAtTime(from, audio.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(to, audio.currentTime + length);
     gain.gain.setValueAtTime(0.0001, audio.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.045, audio.currentTime + 0.012);
-    gain.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 0.085);
+    gain.gain.exponentialRampToValueAtTime(volume, audio.currentTime + 0.018);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + length);
     oscillator.connect(gain);
     gain.connect(audio.destination);
     oscillator.start();
-    oscillator.stop(audio.currentTime + 0.09);
-    window.setTimeout(() => audio.close(), 180);
+    oscillator.stop(audio.currentTime + length + 0.02);
+    window.setTimeout(() => audio.close(), 350);
+}
+
+function getResourceName() {
+    return window.GetParentResourceName ? window.GetParentResourceName() : 'tpm_clothing_studio';
+}
+
+function postNui(eventName, payload = {}) {
+    return fetch(`https://${getResourceName()}/${eventName}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+        body: JSON.stringify(payload)
+    });
+}
+
+function action(eventName, payload = {}) {
+    audioTone('press');
+    return postNui(eventName, payload);
 }
 
 function showToast(title, body, options = {}) {
     window.clearTimeout(toastTimer);
     toastTitle.textContent = title;
     toastBody.textContent = body || '';
-    toast.dataset.visible = 'true';
     toast.classList.toggle('has-progress', options.progress !== undefined);
+    toast.dataset.visible = 'true';
 
     if (options.progress !== undefined) {
         toastProgress.value = Math.max(0, Math.min(100, options.progress));
@@ -136,102 +119,8 @@ function showToast(title, body, options = {}) {
     if (options.timeout !== 0) {
         toastTimer = window.setTimeout(() => {
             toast.dataset.visible = 'false';
-        }, options.timeout || 6500);
+        }, options.timeout || 6000);
     }
-}
-
-function renderAutoActions(state) {
-    autoActions.classList.toggle('is-running', state.active);
-    autoStartButton.hidden = state.active;
-    autoPauseButton.hidden = !state.active || state.paused;
-    autoResumeButton.hidden = !state.active || !state.paused;
-    autoEndButton.hidden = !state.active;
-}
-
-function renderDock(state) {
-    const total = Math.max(1, state.total || 0);
-    const completed = state.completed || 0;
-    const percent = Math.max(0, Math.min(100, Math.floor((completed / total) * 100)));
-
-    dockStatus.textContent = state.active ? (state.paused ? 'Paused' : 'Running') : 'Idle';
-    dockCount.textContent = state.total ? `${completed}/${state.total}` : '0/0';
-    dockEta.textContent = state.active && !state.paused ? formatEta(state.etaSeconds) : '--';
-    dockProgress.style.height = `${percent}%`;
-}
-
-function setLimitModalVisible(visible) {
-    limitModal.dataset.visible = String(visible);
-}
-
-function setWelcomeVisible(visible) {
-    welcomeModal.dataset.visible = String(visible);
-}
-
-function dismissWelcome() {
-    hasSeenWelcome = true;
-    sessionStorage.setItem('tpmWelcomeSeen', 'true');
-    setWelcomeVisible(false);
-}
-
-function startAutoPreview(limit = 0) {
-    return action('autoPreview:start', { limit }).then((response) => response.json()).then((result) => {
-        if (!result.ok) {
-            showToast('Auto Preview did not start', result.error || 'Check F8/client console and server console for a TPM Clothing Studio error.', {
-                timeout: 9000
-            });
-        }
-    }).catch(() => {
-        showToast('Auto Preview error', 'The menu could not talk to the FiveM client callback.', {
-            timeout: 9000
-        });
-    });
-}
-
-function applyTheme(theme) {
-    document.documentElement.dataset.theme = theme;
-    localStorage.setItem('tpmTheme', theme);
-}
-
-function sanitizePackName(value) {
-    return String(value || '').replace(/[^\w-]/g, '_').toLowerCase();
-}
-
-function setFullscreen(enabled) {
-    isFullscreen = enabled;
-    app.classList.toggle('is-fullscreen', enabled);
-    fullscreenToggle.checked = enabled;
-    fullscreenButton.textContent = enabled ? 'Windowed' : 'Full Screen';
-    localStorage.setItem('tpmFullscreen', String(enabled));
-}
-
-function setMinimized(enabled) {
-    isMinimized = enabled;
-    app.classList.toggle('is-minimized', enabled);
-    localStorage.setItem('tpmMinimized', String(enabled));
-    renderDock(autoState);
-}
-
-function setVisible(visible) {
-    app.dataset.visible = String(visible);
-}
-
-function getResourceName() {
-    return window.GetParentResourceName ? window.GetParentResourceName() : 'tpm-clothing-studio';
-}
-
-function postNui(eventName, payload = {}) {
-    return fetch(`https://${getResourceName()}/${eventName}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json; charset=UTF-8'
-        },
-        body: JSON.stringify(payload)
-    });
-}
-
-function action(eventName, payload = {}) {
-    playPressSound();
-    return postNui(eventName, payload);
 }
 
 function setPage(pageName) {
@@ -243,7 +132,6 @@ function setPage(pageName) {
 function fillSlots(mode) {
     currentMode = mode;
     slotSelect.innerHTML = '';
-
     slots[mode].forEach(([id, label]) => {
         const option = document.createElement('option');
         option.value = id;
@@ -252,74 +140,52 @@ function fillSlots(mode) {
     });
 }
 
-function fillPacks(nextPacks = []) {
-    packs = Array.isArray(nextPacks) && nextPacks.length ? nextPacks : packs;
-
-    if (!packs.length) {
-        return;
-    }
-
-    packSelect.innerHTML = '';
-
-    packs.forEach((pack) => {
-        const option = document.createElement('option');
-        option.value = pack.id;
-        option.textContent = pack.label;
-        packSelect.append(option);
-    });
-
-    packSelect.value = activePackId;
-}
-
-function findActivePack() {
-    return packs.find((pack) => pack.id === activePackId) || packs[0] || {
-        label: 'Default / Base GTA',
-        collection: '',
-        resource: ''
-    };
-}
-
 function selectedSlotLabel() {
     return slotSelect.options[slotSelect.selectedIndex]?.textContent || 'Unknown';
+}
+
+function sanitizePackName(value) {
+    return String(value || '').replace(/[^\w-]/g, '_').toLowerCase();
+}
+
+function formatEta(seconds) {
+    if (!Number.isFinite(seconds) || seconds <= 0) return '--';
+    return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+}
+
+function updateFilename(state) {
+    const slot = state.mode === 'prop' ? state.propId : state.componentId;
+    filenameMetric.textContent = `${packName ? `${packName}_` : ''}${state.mode}_${String(slot).padStart(3, '0')}_${String(state.drawable).padStart(3, '0')}_${String(state.texture).padStart(3, '0')}.jpg`;
 }
 
 function updateState(state) {
     currentClothingState = state;
     currentMode = state.mode;
-    activePackId = state.packId || activePackId;
+    activePackLabel = state.packLabel || activePackLabel;
     fillSlots(state.mode);
-    fillPacks(state.packs);
 
     slotSelect.value = String(state.mode === 'prop' ? state.propId : state.componentId);
     drawableInput.value = state.drawable;
     textureInput.value = state.texture;
     drawableInput.max = Math.max(0, state.drawableCount - 1);
     textureInput.max = Math.max(0, state.textureCount - 1);
-
     modeLabel.textContent = state.mode === 'prop' ? 'Prop' : 'Component';
     selectionLabel.textContent = selectedSlotLabel();
     drawableMetric.textContent = `${state.drawable} / ${Math.max(0, state.drawableCount - 1)}`;
     textureMetric.textContent = `${state.texture} / ${Math.max(0, state.textureCount - 1)}`;
-    collectionMetric.textContent = state.collection;
-    const activePack = findActivePack();
+    collectionMetric.textContent = state.collection || 'base';
     browserDrawableCount.textContent = String(state.drawableCount || 0);
     browserTextureCount.textContent = String(state.textureCount || 0);
-    browserPackLabel.textContent = state.packLabel || activePack.label;
-    packMetric.textContent = `${state.packLabel || activePack.label}${activePack.started === false ? ' (not started)' : ''}`;
-    packCollectionMetric.textContent = state.collection || 'base';
-    packResourceMetric.textContent = activePack.resource ? `${activePack.resource}${activePack.started === false ? ' stopped' : ''}` : '--';
-    filenameMetric.textContent = `${packName ? `${packName}_` : ''}${state.mode}_${String(state.mode === 'prop' ? state.propId : state.componentId).padStart(3, '0')}_${String(state.drawable).padStart(3, '0')}_${String(state.texture).padStart(3, '0')}.jpg`;
+    browserPackLabel.textContent = activePackLabel;
+    updateFilename(state);
 }
 
-function formatEta(seconds) {
-    if (!Number.isFinite(seconds) || seconds <= 0) {
-        return '--';
-    }
-
-    const minutes = Math.floor(seconds / 60);
-    const remainder = seconds % 60;
-
-    return `${minutes}m ${remainder}s`;
+function renderAutoActions(state) {
+    autoStartButton.hidden = state.active;
+    autoPauseButton.hidden = !state.active || state.paused;
+    autoResumeButton.hidden = !state.active || !state.paused;
+    autoEndButton.hidden = !state.active;
+    autoActions.classList.toggle('is-running', state.active);
 }
 
 function updateAutoPreview(state) {
@@ -331,229 +197,177 @@ function updateAutoPreview(state) {
     autoProgress.value = percent;
     autoMetric.textContent = state.active ? `${completed} / ${state.total}` : 'Idle';
     etaMetric.textContent = state.paused ? 'Paused' : formatEta(state.etaSeconds);
+    dockStatus.textContent = state.active ? (state.paused ? 'Paused' : 'Running') : 'Idle';
+    dockCount.textContent = state.total ? `${completed} / ${state.total}` : '0 / 0';
     renderAutoActions(state);
-    renderDock(state);
 
     if (state.active) {
-        showToast('Screenshots in progress', `${completed} of ${state.total} captured`, {
-            progress: percent,
-            timeout: 0
-        });
+        showToast('Screenshots in progress', `${completed} of ${state.total} captured`, { progress: percent, timeout: 0 });
     }
 }
 
-function setMode(mode) {
-    fillSlots(mode);
+function setFullscreen(enabled) {
+    isFullscreen = enabled;
+    app.classList.toggle('is-fullscreen', enabled);
+    localStorage.setItem('tpmFullscreen', String(enabled));
+}
 
-    const eventName = mode === 'prop' ? 'clothing:setProp' : 'clothing:setComponent';
-    const key = mode === 'prop' ? 'propId' : 'componentId';
+function setMinimized(enabled) {
+    app.classList.toggle('is-minimized', enabled);
+}
 
-    action(eventName, { [key]: Number(slotSelect.value) });
+function setVisible(visible) {
+    app.dataset.visible = String(visible);
+    if (!visible) setMinimized(false);
+    if (visible) audioTone('open');
+}
+
+function openRangeModal() {
+    const maxDrawable = Math.max(0, (currentClothingState.drawableCount || 1) - 1);
+    rangeModal.dataset.visible = 'true';
+    rangeModal.dataset.step = 'start';
+    rangeTitle.textContent = 'Auto Screenshot Range';
+    rangeBody.textContent = 'What drawable number do you want to start at?';
+    rangeInput.min = '0';
+    rangeInput.max = String(maxDrawable);
+    rangeInput.value = String(Number(drawableInput.value || 0));
+    rangeNextButton.textContent = 'Next';
+    rangeInput.focus();
+}
+
+function submitRangeStep() {
+    const maxDrawable = Math.max(0, (currentClothingState.drawableCount || 1) - 1);
+    const value = Math.max(0, Math.min(maxDrawable, Number(rangeInput.value || 0)));
+
+    if (rangeModal.dataset.step === 'start') {
+        rangeStart = value;
+        rangeModal.dataset.step = 'end';
+        rangeBody.textContent = `Starting at drawable ${rangeStart}. What drawable number do you want to end at?`;
+        rangeInput.min = String(rangeStart);
+        rangeInput.max = String(maxDrawable);
+        rangeInput.value = String(maxDrawable);
+        rangeNextButton.textContent = 'Start';
+        rangeInput.focus();
+        return;
+    }
+
+    rangeModal.dataset.visible = 'false';
+    action('autoPreview:start', { startDrawable: rangeStart, endDrawable: value }).then((response) => response.json()).then((result) => {
+        if (!result.ok) {
+            showToast('Auto Screenshot did not start', result.error || 'Check F8 for details.', { timeout: 9000 });
+        }
+    });
+}
+
+function fillPeds(peds = []) {
+    pedSelect.innerHTML = '';
+    peds.forEach((ped) => {
+        const option = document.createElement('option');
+        option.value = ped.model;
+        option.textContent = `${ped.label}${ped.started === false ? ' (stopped)' : ''}`;
+        pedSelect.append(option);
+    });
 }
 
 window.addEventListener('message', (event) => {
-    if (event.data?.type === 'studio:visibility') {
-        setVisible(Boolean(event.data.visible));
-        if (event.data.visible && !hasSeenWelcome) {
-            setWelcomeVisible(true);
-        }
-    }
-
-    if (event.data?.type === 'clothing:state') {
-        updateState(event.data.payload);
-    }
-
-    if (event.data?.type === 'autoPreview:state') {
-        updateAutoPreview(event.data.payload);
-    }
+    if (event.data?.type === 'studio:visibility') setVisible(Boolean(event.data.visible));
+    if (event.data?.type === 'studio:minimized') setMinimized(Boolean(event.data.minimized));
+    if (event.data?.type === 'clothing:state') updateState(event.data.payload);
+    if (event.data?.type === 'autoPreview:state') updateAutoPreview(event.data.payload);
+    if (event.data?.type === 'peds:update') fillPeds(event.data.payload);
 
     if (event.data?.type === 'screenshot:result') {
         const result = event.data.payload || {};
-        lastSavePath = result.path || lastSavePath;
         captureButton.disabled = false;
-
         if (result.context === 'manual') {
-            showToast(result.success ? 'Screenshot taken' : 'Screenshot failed', result.success ? `Save Location: ${lastSavePath}` : result.message, {
-                timeout: result.success ? 9000 : 12000
-            });
+            showToast(result.success ? 'Screenshot taken' : 'Screenshot failed', result.success ? `Save Location: ${result.path}` : result.message, { timeout: result.success ? 9000 : 12000 });
         }
     }
 
     if (event.data?.type === 'autoPreview:complete') {
-        showToast('Task Complete', `Save Location: ${lastSavePath || 'Check the server console for screenshot-basic output.'}`, {
-            progress: 100,
-            timeout: 12000
-        });
+        audioTone('done');
+        showToast('Task Complete', 'Auto screenshots finished successfully.', { progress: 100, timeout: 12000 });
     }
 
     if (event.data?.type === 'autoPreview:stopped') {
-        showToast('Auto Preview ended', lastSavePath ? `Last Save Location: ${lastSavePath}` : 'Stopped before a screenshot was saved.', {
-            timeout: 8000
-        });
+        audioTone('close');
+        showToast('Auto Screenshot ended', 'The task was cancelled.', { timeout: 8000 });
     }
 
     if (event.data?.type === 'settings:keySaved') {
-        const key = event.data.payload?.key || screenshotKeySelect.value;
-        showToast('Screenshot key saved', `${key} will apply after restarting tpm_clothing_studio.`, {
-            timeout: 6500
-        });
+        showToast('Screenshot key saved', `${event.data.payload?.key || screenshotKeySelect.value} will apply after restarting the resource.`);
     }
 
     if (event.data?.type === 'settings:packSaved') {
         packName = event.data.payload?.packName || '';
         localStorage.setItem('tpmPackName', packName);
-        showToast('Pack name saved', packName ? `Screenshots will use ${packName}_ as the filename prefix.` : 'Pack name cleared.', {
-            timeout: 6500
-        });
+        showToast('Pack name saved', packName ? `Screenshots will use ${packName}_ as the filename prefix.` : 'Pack name cleared.');
     }
 });
 
-navItems.forEach((item) => {
-    item.addEventListener('click', () => {
-        playPressSound();
-        setPage(item.dataset.page);
+navItems.forEach((item) => item.addEventListener('click', () => {
+    audioTone('press');
+    setPage(item.dataset.page);
+}));
+
+document.querySelectorAll('[data-mode]').forEach((button) => button.addEventListener('click', () => {
+    fillSlots(button.dataset.mode);
+    const eventName = button.dataset.mode === 'prop' ? 'clothing:setProp' : 'clothing:setComponent';
+    const key = button.dataset.mode === 'prop' ? 'propId' : 'componentId';
+    action(eventName, { [key]: Number(slotSelect.value) });
+}));
+
+document.querySelectorAll('[data-step]').forEach((button) => button.addEventListener('click', () => {
+    const [field, rawDelta] = button.dataset.step.split(':');
+    const delta = Number(rawDelta);
+    const input = field === 'drawable' ? drawableInput : textureInput;
+    input.value = Number(input.value) + delta;
+    action(field === 'drawable' ? 'clothing:setDrawable' : 'clothing:setTexture', { [field]: Number(input.value) });
+}));
+
+document.querySelectorAll('[data-auto]').forEach((button) => button.addEventListener('click', () => {
+    if (button.dataset.auto === 'start') {
+        audioTone('press');
+        openRangeModal();
+        return;
+    }
+
+    action(`autoPreview:${button.dataset.auto}`);
+}));
+
+document.querySelectorAll('[data-ped-model]').forEach((button) => button.addEventListener('click', () => {
+    action('ped:setModel', { model: button.dataset.pedModel }).then((response) => response.json()).then((result) => {
+        if (!result.ok) showToast('Ped failed', result.error || 'Could not apply that ped.');
+    });
+}));
+
+pedApplyButton.addEventListener('click', () => {
+    action('ped:setModel', { model: pedSelect.value }).then((response) => response.json()).then((result) => {
+        if (!result.ok) showToast('Ped failed', result.error || 'Could not apply that ped.');
     });
 });
 
-document.querySelectorAll('[data-mode]').forEach((button) => {
-    button.addEventListener('click', () => setMode(button.dataset.mode));
-});
-
-document.querySelectorAll('[data-step]').forEach((button) => {
-    button.addEventListener('click', () => {
-        const [field, rawDelta] = button.dataset.step.split(':');
-        const delta = Number(rawDelta);
-        const input = field === 'drawable' ? drawableInput : textureInput;
-        const eventName = field === 'drawable' ? 'clothing:setDrawable' : 'clothing:setTexture';
-
-        input.value = Number(input.value) + delta;
-        action(eventName, { [field]: Number(input.value) });
-    });
-});
-
-document.querySelectorAll('[data-auto]').forEach((button) => {
-    button.addEventListener('click', () => {
-        if (button.dataset.auto === 'start' && currentClothingState.drawableCount > 50) {
-            const total = Math.max(1, currentClothingState.drawableCount || 0);
-            limitModalText.textContent = `This slot has ${total} drawables. How many screenshots do you want to take?`;
-            limitInput.max = String(total);
-            limitInput.value = String(Math.min(50, total));
-            setLimitModalVisible(true);
-            playPressSound();
-            return;
-        }
-
-        if (button.dataset.auto === 'resume' && (!autoState.active || !autoState.paused)) {
-            showToast('Auto Preview is not paused', 'Start a task first, then pause it before using Resume.');
-            return;
-        }
-
-        if (button.dataset.auto === 'pause' && (!autoState.active || autoState.paused)) {
-            showToast('Auto Preview is not running', 'Start a task before using Pause.');
-            return;
-        }
-
-        if (button.dataset.auto === 'stop' && !autoState.active) {
-            showToast('Auto Preview is idle', 'There is no active task to end.');
-            return;
-        }
-
-        if (button.dataset.auto === 'start') {
-            startAutoPreview();
-            return;
-        }
-
-        action(`autoPreview:${button.dataset.auto}`).then((response) => response.json()).then((result) => {
-            if (!result.ok) {
-                showToast('Auto Preview action failed', result.error || 'The Auto Preview action could not run.', {
-                    timeout: 9000
-                });
-            }
-        }).catch(() => {
-            showToast('Auto Preview error', 'The menu could not talk to the FiveM client callback.', {
-                timeout: 9000
-            });
-        });
-    });
-});
-
-limitCancelButton.addEventListener('click', () => {
-    playPressSound();
-    setLimitModalVisible(false);
-});
-
-limitStartButton.addEventListener('click', () => {
-    const max = Number(limitInput.max || currentClothingState.drawableCount || 1);
-    const limit = Math.max(1, Math.min(max, Number(limitInput.value || 1)));
-
-    setLimitModalVisible(false);
-    startAutoPreview(limit);
-});
-
-welcomeLearnButton.addEventListener('click', () => {
-    playPressSound();
-    setPage('info');
-    welcomeLearnButton.hidden = true;
-    welcomeDiveButton.hidden = true;
-    welcomeUnderstoodButton.hidden = false;
-});
-
-welcomeDiveButton.addEventListener('click', () => {
-    playPressSound();
-    dismissWelcome();
-});
-
-welcomeUnderstoodButton.addEventListener('click', () => {
-    playPressSound();
-    dismissWelcome();
-});
-
-slotSelect.addEventListener('change', () => setMode(currentMode));
-packSelect.addEventListener('change', () => {
-    action('pack:setActive', { packId: packSelect.value }).then((response) => response.json()).then((result) => {
-        if (!result.ok) {
-            showToast('Pack not available', 'That pack is not configured correctly yet.', {
-                timeout: 8000
-            });
-        }
-    }).catch(() => {
-        showToast('Pack switch failed', 'The menu could not talk to the pack callback.', {
-            timeout: 8000
-        });
-    });
+slotSelect.addEventListener('change', () => {
+    action(currentMode === 'prop' ? 'clothing:setProp' : 'clothing:setComponent', { [currentMode === 'prop' ? 'propId' : 'componentId']: Number(slotSelect.value) });
 });
 drawableInput.addEventListener('change', () => action('clothing:setDrawable', { drawable: Number(drawableInput.value) }));
 textureInput.addEventListener('change', () => action('clothing:setTexture', { texture: Number(textureInput.value) }));
 
 closeButton.addEventListener('click', () => {
-    playPressSound();
-    setVisible(false);
+    audioTone('close');
     postNui('studio:close');
 });
-
-minimizeButton.addEventListener('click', () => {
-    playPressSound();
-    setMinimized(true);
+minimizeButton.addEventListener('click', () => action('studio:minimize'));
+dockButton.addEventListener('click', () => action('studio:restore'));
+fullscreenButton.addEventListener('click', () => setFullscreen(true));
+windowedButton.addEventListener('click', () => setFullscreen(false));
+rangeCancelButton.addEventListener('click', () => {
+    audioTone('close');
+    rangeModal.dataset.visible = 'false';
 });
-
-dockButton.addEventListener('click', () => {
-    playPressSound();
-    setMinimized(false);
-});
-
-fullscreenButton.addEventListener('click', () => {
-    playPressSound();
-    setFullscreen(!isFullscreen);
-});
-
-fullscreenToggle.addEventListener('change', () => {
-    playPressSound();
-    setFullscreen(fullscreenToggle.checked);
-});
-
-themeSelect.addEventListener('change', () => {
-    playPressSound();
-    applyTheme(themeSelect.value);
+rangeNextButton.addEventListener('click', submitRangeStep);
+rangeInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') submitRangeStep();
 });
 
 screenshotKeySelect.addEventListener('change', () => {
@@ -566,47 +380,35 @@ savePackNameButton.addEventListener('click', () => {
     packNameInput.value = packName;
     localStorage.setItem('tpmPackName', packName);
     action('settings:packName', { packName });
-
-    const clothingState = {
+    updateFilename({
         mode: currentMode,
         componentId: Number(slotSelect.value || 11),
         propId: Number(slotSelect.value || 0),
         drawable: Number(drawableInput.value || 0),
-        texture: Number(textureInput.value || 0),
-        drawableCount: Number(drawableInput.max || 0) + 1,
-        textureCount: Number(textureInput.max || 0) + 1,
-        collection: collectionMetric.textContent || 'base'
-    };
-    updateState(clothingState);
+        texture: Number(textureInput.value || 0)
+    });
 });
 
 captureButton.addEventListener('click', () => {
     showToast('Taking screenshot', 'Hiding the menu and saving the current item...', { timeout: 0 });
     captureButton.disabled = true;
-
     action('screenshot:capture').then((response) => response.json()).then((result) => {
         if (!result.ok) {
-            showToast('Screenshot did not start', result.error || 'The FiveM client rejected the screenshot request.', {
-                timeout: 9000
-            });
+            showToast('Screenshot did not start', result.error || 'The client rejected the screenshot request.', { timeout: 9000 });
             captureButton.disabled = false;
         }
-    }).catch(() => {
-        showToast('Screenshot error', 'The menu could not talk to the screenshot callback.', {
-            timeout: 9000
-        });
-        captureButton.disabled = false;
     });
 });
 
-const savedTheme = localStorage.getItem('tpmTheme') || 'tpm';
-const savedScreenshotKey = localStorage.getItem('tpmScreenshotKey') || 'F13';
-themeSelect.value = savedTheme;
-screenshotKeySelect.value = savedScreenshotKey;
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' || event.key === 'Backspace') {
+        audioTone('close');
+        postNui('studio:close');
+    }
+});
+
+screenshotKeySelect.value = localStorage.getItem('tpmScreenshotKey') || 'F13';
 packNameInput.value = packName;
-applyTheme(savedTheme);
 setFullscreen(isFullscreen);
-setMinimized(isMinimized);
 fillSlots(currentMode);
 renderAutoActions(autoState);
-renderDock(autoState);

@@ -111,11 +111,57 @@ local function discoverClothingPacks()
     return packs
 end
 
+local function discoverPeds()
+    local peds = {
+        {
+            id = 'male',
+            label = 'Male Freemode',
+            model = Config.Peds.defaultMaleModel,
+            type = 'preset'
+        },
+        {
+            id = 'female',
+            label = 'Female Freemode',
+            model = Config.Peds.defaultFemaleModel,
+            type = 'preset'
+        }
+    }
+
+    if not Config.Peds.enabled then
+        return peds
+    end
+
+    local totalResources = GetNumResources()
+    local scanSegment = '/' .. tostring(Config.Peds.scanFolder or '[peds]'):lower() .. '/'
+
+    for index = 0, totalResources - 1 do
+        local folderName = GetResourceByFindIndex(index)
+        local path = folderName and GetResourcePath(folderName)
+
+        if path and path:gsub('\\', '/'):lower():find(scanSegment, 1, true) then
+            peds[#peds + 1] = {
+                id = normalizePackId(folderName),
+                label = folderName,
+                model = folderName,
+                resource = folderName,
+                type = 'resource',
+                started = GetResourceState(folderName) == 'started'
+            }
+        end
+    end
+
+    return peds
+end
+
 RegisterNetEvent('tpm_clothing_studio:packs:request', function()
     local packs = discoverClothingPacks()
 
     print(('[TPM Clothing Studio] Detected %s clothing pack option(s).'):format(#packs))
     TriggerClientEvent('tpm_clothing_studio:packs:update', source, packs)
+end)
+
+RegisterNetEvent('tpm_clothing_studio:peds:request', function()
+    TriggerClientEvent('tpm_clothing_studio:peds:update', source, discoverPeds())
 end)
 
 RegisterNetEvent('tpm_clothing_studio:screenshot:capture', function(filename)
