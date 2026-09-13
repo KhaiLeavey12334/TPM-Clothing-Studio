@@ -70,4 +70,19 @@ RegisterNUICallback('clothing:setTexture', function(data, callback)
     callback({ ok = true })
 end)
 
+RegisterNUICallback('autoPreview:start', function(_, callback)
+    Studio.AutoPreview.Start()
+    callback({ ok = true })
+end)
+
+RegisterNUICallback('autoPreview:pause', function(_, callback)
+    Studio.AutoPreview.Pause()
+    callback({ ok = true })
+end)
+
+RegisterNUICallback('autoPreview:resume', function(_, callback)
+    Studio.AutoPreview.Resume()
+    callback({ ok = true })
+end)
+
 Studio.ModuleLoader.Register('menu', Studio.Menu)
