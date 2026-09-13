@@ -2,7 +2,7 @@ Config = Config or {}
 
 Config.Debug = true
 Config.ResourceName = 'TPM Clothing Studio'
-Config.Version = '0.0.4-alpha'
+Config.Version = '0.0.5-alpha'
 
 Config.Commands = {
     openStudio = 'tpmstudio',
@@ -10,7 +10,8 @@ Config.Commands = {
     nextDrawable = 'tpmnextdrawable',
     previousDrawable = 'tpmprevdrawable',
     nextTexture = 'tpmnexttexture',
-    previousTexture = 'tpmprevtexture'
+    previousTexture = 'tpmprevtexture',
+    screenshot = 'tpmscreenshot'
 }
 
 Config.Nui = {
@@ -97,4 +98,15 @@ Config.Clothing = {
         enabled = true,
         fallback = 'base'
     }
+}
+
+Config.Screenshot = {
+    key = 'F13',
+    delayMs = 500,
+    hideUi = true,
+    folder = 'tpm-clothing-studio',
+    format = '{mode}_{slot}_{drawable}_{texture}',
+    uploadUrl = '',
+    encoding = 'jpg',
+    quality = 0.95
 }
