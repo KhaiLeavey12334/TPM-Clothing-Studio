@@ -17,12 +17,12 @@ shared_scripts {
 }
 
 client_scripts {
-    'client/studio/main.lua',
     'client/camera/main.lua',
     'client/clothing/main.lua',
     'client/menu/main.lua',
     'client/controls/main.lua',
-    'client/screenshot/main.lua'
+    'client/screenshot/main.lua',
+    'client/studio/main.lua'
 }
 
 server_scripts {
