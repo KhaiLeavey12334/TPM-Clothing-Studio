@@ -8,16 +8,100 @@
     </head>
     <body>
         <main class="app" data-visible="false">
-            <header class="app__header">
-                <div>
-                    <p class="eyebrow">Alpha 0.0.1</p>
-                    <h1>TPM Clothing Studio</h1>
+            <aside class="sidebar">
+                <div class="brand">
+                    <span class="brand__mark">TPM</span>
+                    <div>
+                        <h1>Clothing Studio</h1>
+                        <p>Alpha 0.0.4</p>
+                    </div>
                 </div>
-                <button id="closeButton" type="button" aria-label="Close studio">Close</button>
-            </header>
-            <section class="panel">
-                <h2>Framework Ready</h2>
-                <p>The studio shell is loaded. Camera, clothing, screenshot, and auto-preview tools will arrive in the next alpha milestones.</p>
+                <nav class="nav" aria-label="Studio pages">
+                    <button class="nav__item is-active" type="button" data-page="browser">Browser</button>
+                    <button class="nav__item" type="button" data-page="studio">Studio</button>
+                    <button class="nav__item" type="button" data-page="screenshot">Screenshot</button>
+                    <button class="nav__item" type="button" data-page="settings">Settings</button>
+                </nav>
+                <button id="closeButton" class="sidebar__close" type="button">Close</button>
+            </aside>
+
+            <section class="workspace">
+                <header class="topbar">
+                    <div>
+                        <p class="eyebrow">Developer Toolkit</p>
+                        <h2 id="pageTitle">Browser</h2>
+                    </div>
+                    <div class="status">
+                        <span id="modeLabel">Component</span>
+                        <strong id="selectionLabel">Tops</strong>
+                    </div>
+                </header>
+
+                <section class="page is-active" data-page-panel="browser">
+                    <div class="toolbar">
+                        <button type="button" data-mode="component">Components</button>
+                        <button type="button" data-mode="prop">Props</button>
+                    </div>
+                    <div class="browser-grid">
+                        <label>
+                            Slot
+                            <select id="slotSelect"></select>
+                        </label>
+                        <label>
+                            Drawable
+                            <input id="drawableInput" type="number" min="0" value="0">
+                        </label>
+                        <label>
+                            Texture
+                            <input id="textureInput" type="number" min="0" value="0">
+                        </label>
+                    </div>
+                    <div class="stepper-row">
+                        <button type="button" data-step="drawable:-1">Previous Drawable</button>
+                        <button type="button" data-step="drawable:1">Next Drawable</button>
+                        <button type="button" data-step="texture:-1">Previous Texture</button>
+                        <button type="button" data-step="texture:1">Next Texture</button>
+                    </div>
+                </section>
+
+                <section class="page" data-page-panel="studio">
+                    <div class="metric-grid">
+                        <div class="metric">
+                            <span>Drawable</span>
+                            <strong id="drawableMetric">0 / 0</strong>
+                        </div>
+                        <div class="metric">
+                            <span>Texture</span>
+                            <strong id="textureMetric">0 / 0</strong>
+                        </div>
+                        <div class="metric">
+                            <span>Collection</span>
+                            <strong id="collectionMetric">base</strong>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="page" data-page-panel="screenshot">
+                    <div class="empty-state">
+                        <h3>Screenshot Queue</h3>
+                        <p>Manual capture, filename formatting, and delay controls are scheduled for Alpha 0.0.5.</p>
+                    </div>
+                </section>
+
+                <section class="page" data-page-panel="settings">
+                    <div class="settings-list">
+                        <label>
+                            UI theme
+                            <select>
+                                <option>Dark Professional</option>
+                            </select>
+                        </label>
+                        <label>
+                            Default collection
+                            <input type="text" value="base">
+                        </label>
+                    </div>
+                </section>
             </section>
         </main>
         <script src="app.js"></script>
