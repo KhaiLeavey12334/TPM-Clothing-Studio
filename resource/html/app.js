@@ -1,9 +1,5 @@
 const app = document.querySelector('.app');
 const closeButton = document.querySelector('#closeButton');
-const minimizeButton = document.querySelector('#minimizeButton');
-const dockButton = document.querySelector('#dockButton');
-const dockStatus = document.querySelector('#dockStatus');
-const dockCount = document.querySelector('#dockCount');
 const fullscreenButton = document.querySelector('#fullscreenButton');
 const windowedButton = document.querySelector('#windowedButton');
 const screenshotKeySelect = document.querySelector('#screenshotKeySelect');
@@ -197,8 +193,6 @@ function updateAutoPreview(state) {
     autoProgress.value = percent;
     autoMetric.textContent = state.active ? `${completed} / ${state.total}` : 'Idle';
     etaMetric.textContent = state.paused ? 'Paused' : formatEta(state.etaSeconds);
-    dockStatus.textContent = state.active ? (state.paused ? 'Paused' : 'Running') : 'Idle';
-    dockCount.textContent = state.total ? `${completed} / ${state.total}` : '0 / 0';
     renderAutoActions(state);
 
     if (state.active) {
@@ -212,13 +206,8 @@ function setFullscreen(enabled) {
     localStorage.setItem('tpmFullscreen', String(enabled));
 }
 
-function setMinimized(enabled) {
-    app.classList.toggle('is-minimized', enabled);
-}
-
 function setVisible(visible) {
     app.dataset.visible = String(visible);
-    if (!visible) setMinimized(false);
     if (visible) audioTone('open');
 }
 
@@ -233,6 +222,7 @@ function openRangeModal() {
     rangeInput.value = String(Number(drawableInput.value || 0));
     rangeNextButton.textContent = 'Next';
     rangeInput.focus();
+    rangeInput.select();
 }
 
 function submitRangeStep() {
@@ -245,9 +235,10 @@ function submitRangeStep() {
         rangeBody.textContent = `Starting at drawable ${rangeStart}. What drawable number do you want to end at?`;
         rangeInput.min = String(rangeStart);
         rangeInput.max = String(maxDrawable);
-        rangeInput.value = String(maxDrawable);
+        rangeInput.value = String(rangeStart);
         rangeNextButton.textContent = 'Start';
         rangeInput.focus();
+        rangeInput.select();
         return;
     }
 
@@ -271,7 +262,6 @@ function fillPeds(peds = []) {
 
 window.addEventListener('message', (event) => {
     if (event.data?.type === 'studio:visibility') setVisible(Boolean(event.data.visible));
-    if (event.data?.type === 'studio:minimized') setMinimized(Boolean(event.data.minimized));
     if (event.data?.type === 'clothing:state') updateState(event.data.payload);
     if (event.data?.type === 'autoPreview:state') updateAutoPreview(event.data.payload);
     if (event.data?.type === 'peds:update') fillPeds(event.data.payload);
@@ -357,8 +347,6 @@ closeButton.addEventListener('click', () => {
     audioTone('close');
     postNui('studio:close');
 });
-minimizeButton.addEventListener('click', () => action('studio:minimize'));
-dockButton.addEventListener('click', () => action('studio:restore'));
 fullscreenButton.addEventListener('click', () => setFullscreen(true));
 windowedButton.addEventListener('click', () => setFullscreen(false));
 rangeCancelButton.addEventListener('click', () => {
@@ -401,7 +389,7 @@ captureButton.addEventListener('click', () => {
 });
 
 document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' || event.key === 'Backspace') {
+    if (event.key === 'Escape') {
         audioTone('close');
         postNui('studio:close');
     }

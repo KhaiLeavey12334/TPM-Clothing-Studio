@@ -14,7 +14,6 @@ end
 
 CreateThread(function()
     ensureScreenshotDirectory()
-    print(('[TPM Clothing Studio] Server booted for resource "%s".'):format(resourceName))
 end)
 
 local function normalizePackId(name)
@@ -156,7 +155,10 @@ end
 RegisterNetEvent('tpm_clothing_studio:packs:request', function()
     local packs = discoverClothingPacks()
 
-    print(('[TPM Clothing Studio] Detected %s clothing pack option(s).'):format(#packs))
+    if Config.Debug then
+        print(('[TPM Clothing Studio] Detected %s clothing pack option(s).'):format(#packs))
+    end
+
     TriggerClientEvent('tpm_clothing_studio:packs:update', source, packs)
 end)
 
@@ -187,7 +189,10 @@ RegisterNetEvent('tpm_clothing_studio:screenshot:capture', function(filename)
             return
         end
 
-        print(('[TPM Clothing Studio] Screenshot saved for %s as "%s".'):format(playerId, outputPath))
+        if Config.Debug then
+            print(('[TPM Clothing Studio] Screenshot saved for %s as "%s".'):format(playerId, outputPath))
+        end
+
         TriggerClientEvent('tpm_clothing_studio:screenshot:result', playerId, true, nil, outputPath)
     end)
 end)

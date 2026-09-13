@@ -31,6 +31,10 @@ function Studio.Logger.Debug(message)
 end
 
 function Studio.Logger.Info(message)
+    if Config.Logging.showInfo == false then
+        return
+    end
+
     write('info', message)
 end
 

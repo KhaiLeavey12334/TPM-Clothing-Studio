@@ -20,9 +20,6 @@ function Studio.Menu.SetVisible(visible, options)
     options = options or {}
 
     Studio.SetState('nuiVisible', visible)
-    if not visible then
-        Studio.SetState('nuiMinimized', false)
-    end
     SetNuiFocus(visible, visible)
     SendNUIMessage({
         type = 'studio:visibility',
@@ -59,15 +56,6 @@ function Studio.Menu.CancelAndClose()
     Studio.Menu.SetVisible(false)
 end
 
-function Studio.Menu.SetMinimized(minimized)
-    Studio.SetState('nuiMinimized', minimized)
-    SetNuiFocus(not minimized, not minimized)
-    SendNUIMessage({
-        type = 'studio:minimized',
-        minimized = minimized
-    })
-end
-
 function Studio.Menu.Start()
     Studio.Logger.Debug('Menu module ready.')
 end
@@ -84,16 +72,6 @@ end, false)
 
 RegisterNUICallback('studio:close', function(_, callback)
     Studio.Menu.CancelAndClose()
-    callback({ ok = true })
-end)
-
-RegisterNUICallback('studio:minimize', function(_, callback)
-    Studio.Menu.SetMinimized(true)
-    callback({ ok = true })
-end)
-
-RegisterNUICallback('studio:restore', function(_, callback)
-    Studio.Menu.SetMinimized(false)
     callback({ ok = true })
 end)
 
@@ -167,9 +145,18 @@ RegisterNUICallback('ped:setModel', function(data, callback)
 
     SetPlayerModel(PlayerId(), model)
     SetModelAsNoLongerNeeded(model)
-    Wait(150)
+    Wait(250)
+
+    local ped = PlayerPedId()
+    SetPedDefaultComponentVariation(ped)
+    ClearPedDecorations(ped)
+    ClearPedBloodDamage(ped)
+    SetEntityVisible(ped, true, false)
+    SetEntityAlpha(ped, 255, false)
+    SetEntityCollision(ped, true, true)
 
     if Studio.Clothing then
+        Studio.Clothing.SetComponent(Config.Clothing.defaultComponent)
         Studio.Clothing.PublishState()
     end
 
@@ -251,7 +238,7 @@ CreateThread(function()
         Wait(0)
 
         if Studio.GetState('nuiVisible') then
-            if IsControlJustReleased(0, 177) or IsControlJustReleased(0, 200) then
+            if IsControlJustReleased(0, 200) then
                 Studio.Menu.CancelAndClose()
             end
         end

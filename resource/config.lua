@@ -1,6 +1,7 @@
 Config = Config or {}
 
-Config.Debug = true
+-- Enable only while developing the resource. Leave false for normal server use.
+Config.Debug = false
 Config.ResourceName = 'TPM Clothing Studio'
 Config.Version = 'Beta 0.1.1'
 
@@ -23,7 +24,9 @@ Config.Nui = {
 }
 
 Config.Studio = {
+    -- Player position used before automatic screenshots begin.
     autoStartCoords = vector4(-1099.16, -484.86, 36.18, 292.26),
+    -- Locks clear daytime lighting once when the studio is first opened.
     lockDayWeatherOnFirstOpen = true,
     dayHour = 12,
     weather = 'CLEAR'
@@ -31,7 +34,8 @@ Config.Studio = {
 
 Config.Logging = {
     prefix = 'TPM Clothing Studio',
-    showTimestamps = true
+    showTimestamps = false,
+    showInfo = false
 }
 
 Config.Camera = {
@@ -122,6 +126,7 @@ Config.Packs = {
 }
 
 Config.Screenshot = {
+    -- This key can also be changed in the in-game Settings page.
     key = 'F13',
     delayMs = 500,
     hideUi = true,
@@ -142,7 +147,9 @@ Config.AutoPreview = {
 }
 
 Config.Peds = {
+    -- Set enabled to false if this server should only use Male/Female freemode.
     enabled = true,
+    -- Folder segment scanned for ped resources. Default expects resources/[peds]/ped_resource.
     scanFolder = '[peds]',
     defaultMaleModel = 'mp_m_freemode_01',
     defaultFemaleModel = 'mp_f_freemode_01'

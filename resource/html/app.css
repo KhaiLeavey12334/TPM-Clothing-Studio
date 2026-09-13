@@ -16,8 +16,8 @@
     --violet: #8b5cf6;
     --pink: #ff4ecd;
     --lime: #c7f83d;
-    --shadow: 0 24px 70px rgb(0 0 0 / 48%);
-    cursor: crosshair;
+    --shadow: 0 18px 48px rgb(0 0 0 / 42%);
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M4 3l13 9-6 1.2 3.6 6.2-2.4 1.4-3.6-6.3L4 19V3z' fill='%2338d8ff' stroke='%23ffffff' stroke-width='1.4'/%3E%3C/svg%3E") 4 3, auto;
 }
 
 html,
@@ -38,23 +38,20 @@ button,
 input,
 select {
     font: inherit;
-    cursor: crosshair;
+    cursor: inherit;
 }
 
 .app {
     position: relative;
     display: none;
     grid-template-columns: 260px 1fr;
-    width: min(1320px, calc(100vw - 56px));
-    height: min(780px, calc(100vh - 56px));
+    width: min(1180px, calc(100vw - 96px));
+    height: min(700px, calc(100vh - 96px));
     margin: 28px;
     overflow: hidden;
     border: 1px solid var(--border);
     border-radius: 10px;
-    background:
-        radial-gradient(circle at 82% 12%, rgb(56 216 255 / 16%), transparent 28%),
-        radial-gradient(circle at 20% 80%, rgb(139 92 246 / 18%), transparent 30%),
-        linear-gradient(135deg, rgb(7 11 19 / 92%), rgb(9 15 25 / 84%));
+    background: linear-gradient(135deg, rgb(7 11 19 / 94%), rgb(9 15 25 / 90%));
     box-shadow: var(--shadow);
     backdrop-filter: blur(18px);
     pointer-events: auto;
@@ -72,44 +69,6 @@ select {
     width: calc(100vw - 28px);
     height: calc(100vh - 28px);
     margin: 14px;
-}
-
-.app.is-minimized {
-    display: block;
-    width: 118px;
-    height: 178px;
-    margin: 28px auto 0 28px;
-    border-color: var(--border-strong);
-    background: linear-gradient(180deg, #0a101b, #070b12);
-    animation: collapseIn .18s ease-out;
-}
-
-.app.is-minimized .sidebar,
-.app.is-minimized .workspace,
-.app.is-minimized .toast,
-.app.is-minimized .modal {
-    display: none !important;
-}
-
-@keyframes collapseIn {
-    from { width: min(1320px, calc(100vw - 56px)); opacity: .82; }
-    to { width: 118px; opacity: 1; }
-}
-
-.dock {
-    position: absolute;
-    inset: 0;
-    display: none;
-    place-items: center;
-    gap: 8px;
-    padding: 14px;
-    border: 0;
-    background: transparent;
-    color: var(--text);
-}
-
-.app.is-minimized .dock {
-    display: grid;
 }
 
 .sidebar {
@@ -131,15 +90,18 @@ select {
 
 .brand__mark {
     display: inline-block;
-    background: linear-gradient(90deg, #38d8ff 0%, #ff4ecd 28%, #c7f83d 55%, #8b5cf6 78%, #38d8ff 100%);
+    background: linear-gradient(105deg, #16e7ff 0%, #39ff78 28%, #fff35a 48%, #ff45d0 70%, #8f5cff 100%);
     background-clip: text;
     color: transparent;
     -webkit-background-clip: text;
     -webkit-text-stroke: 1px #ffffff;
-    filter: drop-shadow(0 0 10px rgb(56 216 255 / 50%)) drop-shadow(0 0 14px rgb(255 78 205 / 35%));
+    filter: drop-shadow(0 0 9px rgb(56 216 255 / 40%)) drop-shadow(0 0 12px rgb(255 78 205 / 25%));
     font-size: 34px;
+    font-family: "Segoe Script", "Brush Script MT", cursive;
     font-weight: 900;
+    font-style: italic;
     line-height: 1;
+    transform: skew(-8deg);
 }
 
 h1,
@@ -216,6 +178,7 @@ input {
 
 button {
     padding: 0 14px;
+    cursor: pointer;
     transition: border-color .12s ease, background .12s ease, box-shadow .12s ease, transform .12s ease;
 }
 

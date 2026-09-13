@@ -1,0 +1,30 @@
+TPM Clothing Studio
+
+For support contact @el_legion on Discord.
+
+TPM Clothing Studio is a FiveM clothing preview and screenshot toolkit. It is built for server owners, clothing creators, and catalogue makers who need to preview drawables, textures, peds, and clothing packs quickly inside FiveM.
+
+Quick start:
+1. Ensure screenshot-basic.
+2. Ensure tpm_clothing_studio.
+3. Open the studio with F1 or /tpmstudio.
+4. Use Browser to select components, props, drawables, and textures.
+5. Use Screenshot for one image or Studio for automatic range captures.
+
+Auto Screenshot:
+Enter the drawable number to start at, then enter the drawable number to end at. The studio captures every texture for each drawable in that range.
+
+Ped Chooser:
+Male and Female use GTA freemode models. Detected peds are scanned from the folder configured in config.lua under Config.Peds.scanFolder. The default folder is resources/[peds].
+
+Keybinds:
+F1 - Open / close the studio
+F13 - Manual screenshot
+Esc - Close and cancel active work
+
+Screenshots:
+Screenshots are saved by screenshot-basic with structured names such as:
+component_011_000_000.jpg
+
+If a pack name is saved in Settings, it is added as a prefix:
+tpm67_component_011_000_000.jpg
