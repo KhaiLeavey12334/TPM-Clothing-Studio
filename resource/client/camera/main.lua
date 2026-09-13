@@ -4,6 +4,7 @@ local activeCamera = nil
 local currentPresetName = Config.Camera.defaultPreset
 local currentHeading = Config.Camera.presets[Config.Camera.defaultPreset].heading
 local currentDistance = Config.Camera.presets[Config.Camera.defaultPreset].distance
+local lockedPedHeading = nil
 
 local function getTargetPosition(ped, preset)
     local target = GetEntityCoords(ped)
@@ -17,18 +18,32 @@ local function getTargetPosition(ped, preset)
 end
 
 local function getCameraPosition(ped, target, preset, distance)
-    local heading = GetEntityHeading(ped)
-    local directionRadians = math.rad(heading + currentHeading)
-    local forward = vector3(math.sin(directionRadians), math.cos(directionRadians), 0.0)
+    local heading = lockedPedHeading or GetEntityHeading(ped)
+    local forwardRadians = math.rad(heading)
+    local forward = vector3(-math.sin(forwardRadians), math.cos(forwardRadians), 0.0)
     local rightRadians = math.rad(heading + 90.0)
     local right = vector3(math.sin(rightRadians), math.cos(rightRadians), 0.0)
     local offset = preset.offset
 
     return vector3(
-        target.x + (forward.x * distance) + (right.x * offset.x),
-        target.y + (forward.y * distance) + (right.y * offset.x),
+        target.x + (forward.x * distance) + (right.x * (offset.x or 0.0)),
+        target.y + (forward.y * distance) + (right.y * (offset.x or 0.0)),
         target.z + offset.z
     )
+end
+
+local function facePedForAngle(ped, angle)
+    if not lockedPedHeading then
+        lockedPedHeading = GetEntityHeading(ped)
+    end
+
+    local heading = lockedPedHeading
+
+    if angle == 'back' then
+        heading = (lockedPedHeading + 180.0) % 360.0
+    end
+
+    SetEntityHeading(ped, heading)
 end
 
 local function createCamera()
@@ -110,7 +125,9 @@ function Studio.Camera.SetShot(presetName, angle, transitionMs)
 
     currentPresetName = presetName
     currentDistance = preset.distance
-    currentHeading = angle == 'back' and 0.0 or 180.0
+    currentHeading = preset.heading
+
+    facePedForAngle(PlayerPedId(), angle)
 
     return Studio.Camera.ApplyPreset(presetName, transitionMs or 0)
 end
@@ -142,6 +159,7 @@ function Studio.Camera.Destroy()
     RenderScriptCams(false, true, Config.Camera.transitionMs, true, true)
     DestroyCam(activeCamera, false)
     activeCamera = nil
+    lockedPedHeading = nil
     Studio.Logger.Debug('Camera destroyed.')
 end
 

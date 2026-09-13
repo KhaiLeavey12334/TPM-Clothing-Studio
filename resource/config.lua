@@ -3,7 +3,7 @@ Config = Config or {}
 -- Enable only while developing the resource. Leave false for normal server use.
 Config.Debug = false
 Config.ResourceName = 'TPM Clothing Studio'
-Config.Version = 'Beta 0.1.4'
+Config.Version = 'Beta 0.1.5'
 
 Config.Commands = {
     openStudio = 'tpmstudio',
@@ -25,7 +25,7 @@ Config.Nui = {
 
 Config.Studio = {
     -- Player position used before automatic screenshots begin.
-    autoStartCoords = vector4(-1099.16, -484.86, 36.18, 292.26),
+    autoStartCoords = vector4(-800.86, 173.95, 76.74, 153.91),
     -- Locks clear daytime lighting once when the studio is first opened.
     lockDayWeatherOnFirstOpen = true,
     dayHour = 12,

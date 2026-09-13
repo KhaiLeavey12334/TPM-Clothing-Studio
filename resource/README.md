@@ -2,7 +2,7 @@
 
 For support contact `@el_legion` on Discord.
 
-TPM Clothing Studio Beta 0.1.4 is a FiveM developer tool for previewing clothing packs, browsing drawables and textures, switching peds, and capturing catalogue-ready screenshots with clean filenames.
+TPM Clothing Studio Beta 0.1.5 is a FiveM developer tool for previewing clothing packs, browsing drawables and textures, switching peds, and capturing catalogue-ready screenshots with clean filenames.
 
 ## Features
 
