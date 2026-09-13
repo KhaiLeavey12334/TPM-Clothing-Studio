@@ -2,7 +2,19 @@
 
 For support contact `@el_legion` on Discord.
 
-TPM Clothing Studio Beta 0.1.5 is a FiveM developer tool for previewing clothing packs, browsing drawables and textures, switching peds, and capturing catalogue-ready screenshots with clean filenames.
+TPM Clothing Studio Beta 0.1.5 is a FiveM clothing preview and screenshot toolkit built for creators, server owners, and catalogue teams.
+
+Stop wasting hours loading outfits into Blender just to check textures, frame screenshots, and build product previews. TPM Clothing Studio lets you preview clothing directly in FiveM, cycle drawables and textures in-game, and automatically capture clean catalogue screenshots with structured filenames.
+
+It is designed to turn a slow manual clothing-preview workflow into a faster in-server studio process.
+
+## Why Use It?
+
+- Save hours on clothing pack previews and catalogue work.
+- Preview items in the same game environment your players will use.
+- Capture every texture variation without manually clicking through each one.
+- Keep screenshots consistently framed with preset camera positions.
+- Build cleaner clothing showcases for Discord, Tebex, websites, or internal review.
 
 ## Features
 
@@ -17,10 +29,19 @@ TPM Clothing Studio Beta 0.1.5 is a FiveM developer tool for previewing clothing
 - Switch between male, female, and detected ped resources.
 - Use a polished in-game NUI built for clothing catalogue work.
 
+## Included Resources
+
+This repository includes:
+
+- `resource` - TPM Clothing Studio
+- `included-resources/screenshot-basic` - bundled screenshot-basic dependency
+
+Install them as two separate resources. Do not place `screenshot-basic` inside the `tpm_clothing_studio` folder.
+
 ## Installation
 
-1. Place `tpm_clothing_studio` inside your server resources folder.
-2. Place `screenshot-basic` inside your server resources folder as a separate resource. A copy is included in this repository under `included-resources/screenshot-basic`.
+1. Copy `resource` into your server resources folder and rename it to `tpm_clothing_studio`.
+2. Copy `included-resources/screenshot-basic` into your server resources folder as `screenshot-basic`.
 3. Ensure `screenshot-basic` before this resource.
 4. Add this to `server.cfg`:
 
@@ -51,6 +72,16 @@ Use **Studio** for automatic screenshots. Enter the first drawable, then the las
 Use **Ped Chooser** to switch between Male, Female, or detected ped resources.
 
 Press `Esc` to close the UI and cancel active work.
+
+## Recommended Workflow
+
+1. Load into your FiveM server.
+2. Open TPM Clothing Studio with `F1`.
+3. Choose Male, Female, or a detected ped.
+4. Select the clothing component or prop you want to preview.
+5. Choose the screenshot camera position and angle.
+6. Run Auto Screenshot across the drawable range you need.
+7. Use the saved screenshots for your catalogue, Discord posts, or clothing previews.
 
 ## Screenshot Filenames
 
