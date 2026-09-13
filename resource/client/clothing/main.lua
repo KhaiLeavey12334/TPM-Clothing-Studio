@@ -6,8 +6,12 @@ local state = {
     propId = Config.Clothing.defaultProp,
     drawable = 0,
     texture = 0,
-    collection = Config.Clothing.collections.fallback
+    collection = Config.Clothing.collections.fallback,
+    packId = 'base'
 }
+
+local activePack = Config.Packs[1]
+local availablePacks = Config.Packs
 
 local function clampIndex(value, count)
     if count <= 0 then
@@ -21,11 +25,39 @@ local function getPed()
     return PlayerPedId()
 end
 
+local function isCollectionPack()
+    return activePack and activePack.collection and activePack.collection ~= ''
+end
+
+local function callNative(nativeName, fallback, ...)
+    local native = _G[nativeName]
+
+    if type(native) ~= 'function' then
+        return fallback
+    end
+
+    local ok, result = pcall(native, ...)
+
+    if not ok or result == nil then
+        return fallback
+    end
+
+    return result
+end
+
 local function getDrawableCount()
     local ped = getPed()
 
     if state.mode == 'prop' then
+        if isCollectionPack() then
+            return callNative('GetNumberOfPedCollectionPropDrawableVariations', 0, ped, state.propId, activePack.collection)
+        end
+
         return GetNumberOfPedPropDrawableVariations(ped, state.propId) + 1
+    end
+
+    if isCollectionPack() then
+        return callNative('GetNumberOfPedCollectionDrawableVariations', 0, ped, state.componentId, activePack.collection)
     end
 
     return GetNumberOfPedDrawableVariations(ped, state.componentId)
@@ -37,10 +69,38 @@ local function getTextureCount()
     if state.mode == 'prop' then
         local propDrawable = math.max(0, state.drawable - 1)
 
+        if isCollectionPack() then
+            return callNative('GetNumberOfPedCollectionPropTextureVariations', 0, ped, state.propId, activePack.collection, propDrawable)
+        end
+
         return GetNumberOfPedPropTextureVariations(ped, state.propId, propDrawable)
     end
 
+    if isCollectionPack() then
+        return callNative('GetNumberOfPedCollectionTextureVariations', 0, ped, state.componentId, activePack.collection, state.drawable)
+    end
+
     return GetNumberOfPedTextureVariations(ped, state.componentId, state.drawable)
+end
+
+local function getTextureCountForDrawable(drawable)
+    local ped = getPed()
+
+    if state.mode == 'prop' then
+        local propDrawable = math.max(0, drawable - 1)
+
+        if isCollectionPack() then
+            return callNative('GetNumberOfPedCollectionPropTextureVariations', 0, ped, state.propId, activePack.collection, propDrawable)
+        end
+
+        return GetNumberOfPedPropTextureVariations(ped, state.propId, propDrawable)
+    end
+
+    if isCollectionPack() then
+        return callNative('GetNumberOfPedCollectionTextureVariations', 0, ped, state.componentId, activePack.collection, drawable)
+    end
+
+    return GetNumberOfPedTextureVariations(ped, state.componentId, drawable)
 end
 
 local function applyComponent()
@@ -48,6 +108,12 @@ local function applyComponent()
     local textureCount = getTextureCount()
 
     state.texture = clampIndex(state.texture, textureCount)
+
+    if isCollectionPack() then
+        callNative('SetPedCollectionComponentVariation', nil, ped, state.componentId, activePack.collection, state.drawable, state.texture, 0)
+        return
+    end
+
     SetPedComponentVariation(ped, state.componentId, state.drawable, state.texture, 0)
 end
 
@@ -59,6 +125,11 @@ local function applyProp()
 
     if state.drawable <= 0 then
         ClearPedProp(ped, state.propId)
+        return
+    end
+
+    if isCollectionPack() then
+        callNative('SetPedCollectionPropIndex', nil, ped, state.propId, activePack.collection, state.drawable - 1, state.texture, true)
         return
     end
 
@@ -77,7 +148,10 @@ function Studio.Clothing.PublishState()
         texture = state.texture,
         drawableCount = drawableCount,
         textureCount = textureCount,
-        collection = state.collection
+        collection = state.collection,
+        packId = state.packId,
+        packLabel = activePack.label or 'Default / Base GTA',
+        packs = availablePacks
     })
 
     SendNUIMessage({
@@ -106,6 +180,10 @@ end
 
 function Studio.Clothing.GetTextureCount()
     return getTextureCount()
+end
+
+function Studio.Clothing.GetTextureCountForDrawable(drawable)
+    return getTextureCountForDrawable(drawable)
 end
 
 function Studio.Clothing.SetComponent(componentId)
@@ -146,6 +224,51 @@ end
 function Studio.Clothing.SetCollection(collectionName)
     state.collection = collectionName or Config.Clothing.collections.fallback
     Studio.Clothing.PublishState()
+end
+
+function Studio.Clothing.SetPack(packId)
+    for _, pack in ipairs(availablePacks) do
+        if pack.id == packId then
+            activePack = pack
+            state.packId = pack.id
+            state.collection = pack.collection ~= '' and pack.collection or Config.Clothing.collections.fallback
+            state.drawable = 0
+            state.texture = 0
+            applyCurrent()
+            return true
+        end
+    end
+
+    return false
+end
+
+function Studio.Clothing.SetAvailablePacks(packs)
+    if type(packs) ~= 'table' or #packs == 0 then
+        return
+    end
+
+    availablePacks = packs
+
+    local activeExists = false
+    for _, pack in ipairs(availablePacks) do
+        if pack.id == state.packId then
+            activePack = pack
+            activeExists = true
+            break
+        end
+    end
+
+    if not activeExists then
+        activePack = availablePacks[1]
+        state.packId = activePack.id
+        state.collection = Config.Clothing.collections.fallback
+    end
+
+    Studio.Clothing.PublishState()
+end
+
+function Studio.Clothing.GetPack()
+    return activePack
 end
 
 function Studio.Clothing.GetComponents()

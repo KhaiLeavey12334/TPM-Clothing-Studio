@@ -2,7 +2,7 @@ Config = Config or {}
 
 Config.Debug = true
 Config.ResourceName = 'TPM Clothing Studio'
-Config.Version = '0.0.6-alpha'
+Config.Version = 'Beta 0.1.1'
 
 Config.Commands = {
     openStudio = 'tpmstudio',
@@ -14,7 +14,8 @@ Config.Commands = {
     screenshot = 'tpmscreenshot',
     autoPreview = 'tpmautopreview',
     pauseAutoPreview = 'tpmpausepreview',
-    resumeAutoPreview = 'tpmresumepreview'
+    resumeAutoPreview = 'tpmresumepreview',
+    stopAutoPreview = 'tpmstoppreview'
 }
 
 Config.Nui = {
@@ -100,6 +101,16 @@ Config.Clothing = {
     collections = {
         enabled = true,
         fallback = 'base'
+    }
+}
+
+Config.Packs = {
+    {
+        id = 'base',
+        label = 'Default / Base GTA',
+        resource = '',
+        collection = '',
+        gender = 'any'
     }
 }
 

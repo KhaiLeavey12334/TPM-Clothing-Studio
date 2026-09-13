@@ -5,12 +5,6 @@ local currentPresetName = Config.Camera.defaultPreset
 local currentHeading = Config.Camera.presets[Config.Camera.defaultPreset].heading
 local currentDistance = Config.Camera.presets[Config.Camera.defaultPreset].distance
 
-local function rotationToDirection(heading)
-    local radians = math.rad(heading)
-
-    return vector3(math.sin(radians), math.cos(radians), 0.0)
-end
-
 local function getTargetPosition(ped, preset)
     local target = GetEntityCoords(ped)
 
@@ -22,13 +16,16 @@ local function getTargetPosition(ped, preset)
     return target + preset.targetOffset
 end
 
-local function getCameraPosition(target, preset, heading, distance)
-    local direction = rotationToDirection(heading)
+local function getCameraPosition(ped, target, preset, distance)
+    local forward = GetEntityForwardVector(ped)
+    local heading = GetEntityHeading(ped)
+    local rightRadians = math.rad(heading + 90.0)
+    local right = vector3(math.sin(rightRadians), math.cos(rightRadians), 0.0)
     local offset = preset.offset
 
     return vector3(
-        target.x + (direction.x * distance) + offset.x,
-        target.y + (direction.y * distance) + offset.y - distance,
+        target.x + (forward.x * distance) + (right.x * offset.x),
+        target.y + (forward.y * distance) + (right.y * offset.x),
         target.z + offset.z
     )
 end
@@ -93,7 +90,7 @@ function Studio.Camera.ApplyPreset(presetName, transitionMs)
 
     local ped = PlayerPedId()
     local target = getTargetPosition(ped, preset)
-    local position = getCameraPosition(target, preset, currentHeading, currentDistance)
+    local position = getCameraPosition(ped, target, preset, currentDistance)
 
     currentPresetName = presetName
 

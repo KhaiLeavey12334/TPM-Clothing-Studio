@@ -1,28 +1,42 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="tpm" style="background: transparent !important; background-color: transparent !important;">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>TPM Clothing Studio</title>
         <link rel="stylesheet" href="app.css">
     </head>
-    <body>
+    <body style="background: transparent !important; background-color: transparent !important;">
         <main class="app" data-visible="false">
+            <button id="dockButton" class="status-dock" type="button" title="Expand studio">
+                <span class="status-dock__brand">TPM</span>
+                <span id="dockStatus" class="status-dock__status">Idle</span>
+                <span id="dockCount" class="status-dock__count">0 / 0</span>
+                <span id="dockEta" class="status-dock__eta">--</span>
+                <span class="status-dock__bar">
+                    <span id="dockProgress" class="status-dock__fill"></span>
+                </span>
+            </button>
             <aside class="sidebar">
                 <div class="brand">
-                    <span class="brand__mark">TPM</span>
+                    <span class="brand__mark" aria-hidden="true">TPM</span>
                     <div>
                         <h1>Clothing Studio</h1>
-                        <p>Alpha 0.0.6</p>
+                        <p>Beta 0.1.1</p>
                     </div>
                 </div>
                 <nav class="nav" aria-label="Studio pages">
                     <button class="nav__item is-active" type="button" data-page="browser">Browser</button>
+                    <button class="nav__item" type="button" data-page="packs">Pack Choice</button>
                     <button class="nav__item" type="button" data-page="studio">Studio</button>
                     <button class="nav__item" type="button" data-page="screenshot">Screenshot</button>
                     <button class="nav__item" type="button" data-page="settings">Settings</button>
+                    <button class="nav__item" type="button" data-page="info">Info</button>
                 </nav>
-                <button id="closeButton" class="sidebar__close" type="button">Close</button>
+                <div class="sidebar__actions">
+                    <button id="fullscreenButton" type="button">Full Screen</button>
+                    <button id="closeButton" type="button">Close</button>
+                </div>
             </aside>
 
             <section class="workspace">
@@ -34,6 +48,9 @@
                     <div class="status">
                         <span id="modeLabel">Component</span>
                         <strong id="selectionLabel">Tops</strong>
+                    </div>
+                    <div class="topbar-actions">
+                        <button id="minimizeButton" class="window-control" type="button" title="Minimize">_</button>
                     </div>
                 </header>
 
@@ -56,11 +73,53 @@
                             <input id="textureInput" type="number" min="0" value="0">
                         </label>
                     </div>
+                    <div class="metric-grid browser-summary">
+                        <div class="metric">
+                            <span>Available Drawables</span>
+                            <strong id="browserDrawableCount">0</strong>
+                        </div>
+                        <div class="metric">
+                            <span>Available Textures</span>
+                            <strong id="browserTextureCount">0</strong>
+                        </div>
+                        <div class="metric">
+                            <span>Selected Pack</span>
+                            <strong id="browserPackLabel">Base GTA</strong>
+                        </div>
+                    </div>
                     <div class="stepper-row">
                         <button type="button" data-step="drawable:-1">Previous Drawable</button>
                         <button type="button" data-step="drawable:1">Next Drawable</button>
                         <button type="button" data-step="texture:-1">Previous Texture</button>
                         <button type="button" data-step="texture:1">Next Texture</button>
+                    </div>
+                </section>
+
+                <section class="page" data-page-panel="packs">
+                    <div class="pack-panel">
+                        <div>
+                            <h3>Pack Choice</h3>
+                            <p>Select the clothing pack to preview. Base GTA uses normal clothing; custom packs use their configured collection name.</p>
+                        </div>
+                        <label>
+                            Active pack
+                            <select id="packSelect"></select>
+                        </label>
+                        <div class="metric-grid">
+                            <div class="metric">
+                                <span>Pack</span>
+                                <strong id="packMetric">Default / Base GTA</strong>
+                            </div>
+                            <div class="metric">
+                                <span>Collection</span>
+                                <strong id="packCollectionMetric">base</strong>
+                            </div>
+                            <div class="metric">
+                                <span>Resource</span>
+                                <strong id="packResourceMetric">--</strong>
+                            </div>
+                        </div>
+                        <p class="settings-note">Put clothing resources in resources/[clothingpacks]/pack_name, ensure them before this studio, then add the pack collection in config.lua.</p>
                     </div>
                 </section>
 
@@ -71,10 +130,11 @@
                             <p>Cycle the active slot through every drawable and texture, capture each variation, and track progress.</p>
                         </div>
                         <progress id="autoProgress" max="100" value="0"></progress>
-                        <div class="auto-actions">
-                            <button type="button" data-auto="start">Start</button>
-                            <button type="button" data-auto="pause">Pause</button>
-                            <button type="button" data-auto="resume">Resume</button>
+                        <div class="auto-actions" id="autoActions">
+                            <button id="autoStartButton" type="button" data-auto="start">Start</button>
+                            <button id="autoPauseButton" type="button" data-auto="pause">Pause</button>
+                            <button id="autoResumeButton" type="button" data-auto="resume">Resume</button>
+                            <button id="autoEndButton" type="button" data-auto="stop">End</button>
                         </div>
                     </div>
                     <div class="metric-grid">
@@ -111,6 +171,7 @@
                             <span>Filename Preview</span>
                             <strong id="filenameMetric">component_011_000_000.jpg</strong>
                         </div>
+                        <button id="captureButton" type="button">Take Screenshot</button>
                     </div>
                 </section>
 
@@ -118,17 +179,112 @@
                     <div class="settings-list">
                         <label>
                             UI theme
-                            <select>
-                                <option>Dark Professional</option>
+                            <select id="themeSelect">
+                                <option value="tpm">TPM Branding</option>
+                                <option value="slate">Slate Professional</option>
+                                <option value="carbon">Carbon Gold</option>
+                                <option value="emerald">Emerald Studio</option>
+                                <option value="royal">Royal Violet</option>
+                                <option value="crimson">Crimson Graphite</option>
+                                <option value="pink">Pink Studio</option>
                             </select>
                         </label>
+                        <label class="toggle-row">
+                            <span>Full screen menu</span>
+                            <input id="fullscreenToggle" type="checkbox">
+                        </label>
+                        <label>
+                            Screenshot keybind
+                            <select id="screenshotKeySelect">
+                                <option value="F13">F13</option>
+                                <option value="F10">F10</option>
+                                <option value="F11">F11</option>
+                                <option value="F12">F12</option>
+                                <option value="INSERT">Insert</option>
+                                <option value="HOME">Home</option>
+                                <option value="PAGEUP">Page Up</option>
+                                <option value="PAGEDOWN">Page Down</option>
+                            </select>
+                        </label>
+                        <p class="settings-note">Saved keybind applies after restarting this resource. You can also change it in FiveM key bindings.</p>
+                        <label>
+                            Create Pack Name
+                            <input id="packNameInput" type="text" placeholder="tpm67" maxlength="40">
+                        </label>
+                        <button id="savePackNameButton" type="button">Save Pack Name</button>
+                        <p class="settings-note">Adds the pack name to screenshots, for example tpm67_component_011_000_000.jpg.</p>
                         <label>
                             Default collection
                             <input type="text" value="base">
                         </label>
                     </div>
                 </section>
+
+                <section class="page" data-page-panel="info">
+                    <div class="info-panel">
+                        <div class="product-title">
+                            <strong class="product-title__tpm">TPM</strong>
+                            <span>Clothing Studio</span>
+                        </div>
+                        <p class="settings-note">Developed by TPM.zip @el_legion</p>
+                        <div class="metric-grid">
+                            <div class="metric">
+                                <span>Open menu</span>
+                                <strong>F1</strong>
+                            </div>
+                            <div class="metric">
+                                <span>Screenshot</span>
+                                <strong>F13</strong>
+                            </div>
+                            <div class="metric">
+                                <span>Stop Auto</span>
+                                <strong>Space</strong>
+                            </div>
+                        </div>
+                        <div class="info-copy">
+                            <h3>How to use</h3>
+                            <p>Choose a pack, pick a component or prop, preview drawables and textures, then capture manually or run Auto Preview.</p>
+                            <p>Put clothing packs in resources/[clothingpacks]/pack_name/stream and restart the studio to detect them.</p>
+                            <p>Commands: /tpmstudio, /tpmscreenshot, /tpmautopreview, /tpmpausepreview, /tpmresumepreview, /tpmstoppreview.</p>
+                            <p>All registered keybinds can be changed in FiveM/GTA key bindings after the resource restarts.</p>
+                        </div>
+                    </div>
+                </section>
             </section>
+            <div id="toast" class="toast" data-visible="false" role="status" aria-live="polite">
+                <strong id="toastTitle">Ready</strong>
+                <span id="toastBody"></span>
+                <progress id="toastProgress" max="100" value="0"></progress>
+            </div>
+            <div id="limitModal" class="modal" data-visible="false" role="dialog" aria-modal="true">
+                <div class="modal__panel">
+                    <h3>Large Auto Preview</h3>
+                    <p id="limitModalText">This slot has a lot of drawables. Choose how many screenshots to take.</p>
+                    <label>
+                        Screenshot limit
+                        <input id="limitInput" type="number" min="1" value="50">
+                    </label>
+                    <div class="modal__actions">
+                        <button id="limitCancelButton" type="button">Cancel</button>
+                        <button id="limitStartButton" type="button">Start</button>
+                    </div>
+                </div>
+            </div>
+            <div id="welcomeModal" class="modal welcome-modal" data-visible="false" role="dialog" aria-modal="true">
+                <div class="modal__panel welcome-modal__panel">
+                    <div class="product-title">
+                        <strong class="product-title__tpm">TPM</strong>
+                        <span>Clothing Studio</span>
+                    </div>
+                    <p class="settings-note">Developed by TPM.zip @el_legion</p>
+                    <p>Preview clothing packs, cycle drawables and textures, and capture catalogue-ready screenshots.</p>
+                    <div class="modal__actions">
+                        <button id="welcomeLearnButton" type="button">Learn how to use</button>
+                        <button id="welcomeDiveButton" type="button">Dive In</button>
+                    </div>
+                    <button id="welcomeUnderstoodButton" type="button" hidden>Understood</button>
+                </div>
+            </div>
         </main>
         <script src="app.js"></script>
     </body>

@@ -12,6 +12,10 @@ local function timestamp()
         return ''
     end
 
+    if type(os) ~= 'table' or type(os.date) ~= 'function' then
+        return ''
+    end
+
     return os.date('[%H:%M:%S] ')
 end
 
