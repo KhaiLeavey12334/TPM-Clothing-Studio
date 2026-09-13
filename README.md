@@ -4,9 +4,9 @@ TPM Clothing Studio is a FiveM developer toolkit for previewing custom clothing,
 
 ## Current Version
 
-`0.0.5-alpha`
+`0.0.6-alpha`
 
-Alpha 0.0.5 includes the production framework, camera system, clothing engine, full NUI, and manual screenshots:
+Alpha 0.0.6 includes the production framework, camera system, clothing engine, full NUI, manual screenshots, and Auto Preview:
 
 - FiveM `fxmanifest.lua`
 - Lua 5.4 resource configuration
@@ -29,6 +29,9 @@ Alpha 0.0.5 includes the production framework, camera system, clothing engine, f
 - F13 screenshot capture
 - Automatic filename formatting
 - UI hiding and capture delay
+- Automatic drawable and texture cycling
+- Automatic screenshots during Auto Preview
+- Progress, ETA, pause, and resume controls
 
 ## Install
 
@@ -44,6 +47,7 @@ ensure tpm_clothing_studio
 5. Use `/tpmcamera` to toggle the current scripted preview camera.
 6. Use `/tpmnextdrawable`, `/tpmprevdrawable`, `/tpmnexttexture`, and `/tpmprevtexture` to test clothing browsing.
 7. Use F13 or `/tpmscreenshot` to capture the current clothing item.
+8. Use `/tpmautopreview`, `/tpmpausepreview`, and `/tpmresumepreview` to run Auto Preview.
 
 ## Roadmap
 
