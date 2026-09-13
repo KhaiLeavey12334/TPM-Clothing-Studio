@@ -1,6 +1,10 @@
 Studio.Screenshot = Studio.Screenshot or {}
 
 local captureInProgress = false
+local lastCaptureContext = 'manual'
+local shouldReopenMenu = false
+local restoreUiAfterCapture = false
+local restoreUiVisible = false
 
 local function pad(value)
     return ('%03d'):format(value or 0)
@@ -8,6 +12,16 @@ end
 
 local function sanitize(value)
     return tostring(value or 'unknown'):gsub('[^%w%-_]', '_'):lower()
+end
+
+local function getPackPrefix()
+    local packName = GetResourceKvpString('tpm_clothing_studio:pack_name')
+
+    if not packName or packName == '' then
+        return ''
+    end
+
+    return sanitize(packName) .. '_'
 end
 
 local function buildFilename()
@@ -20,7 +34,7 @@ local function buildFilename()
         :gsub('{texture}', pad(clothing.texture))
         :gsub('{collection}', sanitize(clothing.collection))
 
-    return ('%s/%s.%s'):format(Config.Screenshot.folder, filename, Config.Screenshot.encoding)
+    return ('%s/%s%s.%s'):format(Config.Screenshot.folder, getPackPrefix(), filename, Config.Screenshot.encoding)
 end
 
 local function setUiVisible(visible)
@@ -28,7 +42,14 @@ local function setUiVisible(visible)
         return
     end
 
-    Studio.Menu.SetVisible(visible)
+    if Studio.Menu.SetCaptureVisible then
+        Studio.Menu.SetCaptureVisible(visible)
+        return
+    end
+
+    Studio.Menu.SetVisible(visible, {
+        keepCamera = true
+    })
 end
 
 local function requestScreenshot(filename)
@@ -46,6 +67,37 @@ local function requestScreenshot(filename)
     TriggerServerEvent('tpm_clothing_studio:screenshot:capture', filename)
 end
 
+local function publishScreenshotStatus(success, message, path)
+    if restoreUiAfterCapture and Studio.Menu then
+        Studio.Menu.SetVisible(restoreUiVisible, {
+            keepCamera = true
+        })
+        restoreUiAfterCapture = false
+        restoreUiVisible = false
+    end
+
+    if lastCaptureContext == 'manual' and shouldReopenMenu and Studio.Menu then
+        Studio.Menu.SetVisible(true, {
+            keepCamera = true
+        })
+        shouldReopenMenu = false
+    end
+
+    SendNUIMessage({
+        type = 'screenshot:result',
+        payload = {
+            success = success,
+            message = message,
+            path = path,
+            context = lastCaptureContext
+        }
+    })
+
+    if lastCaptureContext == 'manual' and Studio.Camera then
+        Studio.Camera.Destroy()
+    end
+end
+
 function Studio.Screenshot.BuildFilename()
     return buildFilename()
 end
@@ -54,36 +106,73 @@ function Studio.Screenshot.IsBusy()
     return captureInProgress
 end
 
-function Studio.Screenshot.Capture()
+function Studio.Screenshot.Capture(context)
     if captureInProgress then
         Studio.Logger.Warn('Screenshot capture already in progress.')
-        return false
+        publishScreenshotStatus(false, 'Screenshot capture already in progress. Wait for the current capture to finish.', nil)
+        return false, 'Screenshot capture already in progress.'
+    end
+
+    if Config.Screenshot.uploadUrl == '' and GetResourceState('screenshot-basic') ~= 'started' then
+        local message = 'screenshot-basic is not started. Start screenshot-basic before taking screenshots.'
+
+        Studio.Logger.Error(message)
+        publishScreenshotStatus(false, message, nil)
+        return false, message
     end
 
     captureInProgress = true
+    lastCaptureContext = context or 'manual'
 
     CreateThread(function()
         local wasVisible = Studio.GetState('nuiVisible')
         local filename = buildFilename()
 
+        if lastCaptureContext == 'manual' and Studio.Camera then
+            Studio.Camera.ApplyPreset(Config.AutoPreview.cameraPreset, 0)
+            Wait(150)
+        end
+
+        restoreUiAfterCapture = wasVisible
+        restoreUiVisible = wasVisible
+        shouldReopenMenu = lastCaptureContext == 'manual' and wasVisible
         setUiVisible(false)
         Wait(Config.Screenshot.delayMs)
         requestScreenshot(filename)
-        Wait(250)
-        setUiVisible(wasVisible)
 
-        captureInProgress = false
+        local timeoutAt = GetGameTimer() + 10000
+        while captureInProgress and GetGameTimer() < timeoutAt do
+            Wait(100)
+        end
+
+        if captureInProgress then
+            captureInProgress = false
+            publishScreenshotStatus(false, 'Screenshot timed out before screenshot-basic returned a result.', nil)
+        end
     end)
 
-    return true
+    return true, nil
 end
 
+RegisterNetEvent('tpm_clothing_studio:screenshot:result', function(success, errorMessage, outputPath)
+    local message = success and 'Screenshot taken' or ('Screenshot failed: ' .. tostring(errorMessage or 'unknown error'))
+    publishScreenshotStatus(success, message, outputPath)
+    captureInProgress = false
+end)
+
 function Studio.Screenshot.Start()
+    local savedKey = GetResourceKvpString('tpm_clothing_studio:screenshot_key')
+    local key = savedKey ~= nil and savedKey ~= '' and savedKey or Config.Screenshot.key
+
     RegisterCommand(Config.Commands.screenshot, function()
-        Studio.Screenshot.Capture()
+        local ok, errorMessage = Studio.Screenshot.Capture('manual')
+
+        if not ok then
+            Studio.Logger.Warn(errorMessage or 'Screenshot command failed.')
+        end
     end, false)
 
-    RegisterKeyMapping(Config.Commands.screenshot, 'TPM Clothing Studio screenshot', 'keyboard', Config.Screenshot.key)
+    RegisterKeyMapping(Config.Commands.screenshot, 'TPM Clothing Studio screenshot', 'keyboard', key)
     Studio.Logger.Debug('Screenshot module ready.')
 end
 
