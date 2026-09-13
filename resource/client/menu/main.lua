@@ -197,6 +197,14 @@ RegisterNUICallback('screenshot:capture', function(_, callback)
     callback({ ok = ok, error = errorMessage })
 end)
 
+RegisterNUICallback('screenshot:camera', function(data, callback)
+    local preset = tostring(data.preset or Config.AutoPreview.cameraPreset)
+    local angle = tostring(data.angle or 'front')
+
+    Studio.Screenshot.SetCameraSettings(preset, angle)
+    callback({ ok = true })
+end)
+
 RegisterNUICallback('settings:screenshotKey', function(data, callback)
     local key = tostring(data.key or Config.Screenshot.key):upper()
 

@@ -17,8 +17,9 @@ local function getTargetPosition(ped, preset)
 end
 
 local function getCameraPosition(ped, target, preset, distance)
-    local forward = GetEntityForwardVector(ped)
     local heading = GetEntityHeading(ped)
+    local directionRadians = math.rad(heading + currentHeading)
+    local forward = vector3(math.sin(directionRadians), math.cos(directionRadians), 0.0)
     local rightRadians = math.rad(heading + 90.0)
     local right = vector3(math.sin(rightRadians), math.cos(rightRadians), 0.0)
     local offset = preset.offset
@@ -98,6 +99,20 @@ function Studio.Camera.ApplyPreset(presetName, transitionMs)
     Studio.Logger.Debug(('Applied camera preset "%s".'):format(presetName))
 
     return true
+end
+
+function Studio.Camera.SetShot(presetName, angle, transitionMs)
+    local preset = Config.Camera.presets[presetName]
+
+    if not preset then
+        return false
+    end
+
+    currentPresetName = presetName
+    currentDistance = preset.distance
+    currentHeading = angle == 'back' and 0.0 or 180.0
+
+    return Studio.Camera.ApplyPreset(presetName, transitionMs or 0)
 end
 
 function Studio.Camera.Rotate(delta)

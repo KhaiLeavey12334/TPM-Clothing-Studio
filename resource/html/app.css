@@ -45,8 +45,8 @@ select {
     position: relative;
     display: none;
     align-items: start;
-    grid-template-columns: 260px 1fr;
-    width: min(1180px, calc(100vw - 96px));
+    grid-template-columns: 220px 1fr;
+    width: min(900px, calc(100vw - 96px));
     height: auto;
     max-height: calc(100vh - 96px);
     margin: 28px;
@@ -122,8 +122,8 @@ select {
     display: flex;
     flex-direction: column;
     gap: 18px;
-    min-width: 260px;
-    padding: 24px;
+    min-width: 220px;
+    padding: 18px;
     border-right: 1px solid var(--border);
     border-radius: 10px 0 0 10px;
     background: linear-gradient(180deg, rgb(9 14 23 / 78%), rgb(7 11 19 / 88%));
@@ -139,13 +139,13 @@ select {
 
 .brand__mark {
     display: inline-block;
-    background: linear-gradient(105deg, #00eaff 0%, #00ff66 27%, #fff200 48%, #ff18c8 70%, #7b35ff 100%);
+    background: linear-gradient(105deg, #00f5ff 0%, #20ff00 24%, #fff000 45%, #ff0099 68%, #5a00ff 100%);
     background-clip: text;
     color: transparent;
     -webkit-background-clip: text;
     -webkit-text-stroke: 1px #ffffff;
     filter: none;
-    font-size: 34px;
+    font-size: 32px;
     font-family: "Segoe Script", "Brush Script MT", cursive;
     font-weight: 900;
     font-style: italic;
@@ -162,12 +162,12 @@ p {
 
 h1 {
     margin-bottom: 2px;
-    font-size: 20px;
+    font-size: 18px;
 }
 
 h2 {
     margin-bottom: 0;
-    font-size: 30px;
+    font-size: 24px;
 }
 
 h3 {
@@ -271,7 +271,7 @@ select {
     align-items: center;
     justify-content: space-between;
     gap: 22px;
-    padding: 24px 28px;
+    padding: 18px 22px;
     border-bottom: 1px solid var(--border);
 }
 
@@ -310,7 +310,7 @@ select {
 .page {
     display: none;
     min-height: 0;
-    padding: 28px;
+    padding: 22px;
     overflow: auto;
 }
 
@@ -320,7 +320,7 @@ select {
 
 .toolbar {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .browser-grid,
@@ -365,7 +365,7 @@ label {
 
 .metric strong {
     color: #ffffff;
-    font-size: 28px;
+    font-size: 22px;
 }
 
 progress {
@@ -433,6 +433,21 @@ progress {
 
 .settings-list {
     max-width: 560px;
+}
+
+.app[data-visible="true"]:not(.is-booting) {
+    align-items: stretch;
+}
+
+.app[data-visible="true"]:not(.is-booting) .sidebar,
+.app[data-visible="true"]:not(.is-booting) .workspace {
+    height: 100%;
+}
+
+.screenshot-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
 }
 
 .settings-note {

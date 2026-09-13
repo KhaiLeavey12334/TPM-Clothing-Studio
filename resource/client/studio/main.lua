@@ -121,7 +121,12 @@ function Studio.AutoPreview.Start(startDrawable, endDrawable)
     autoState.error = ''
 
     if Studio.Camera then
-        Studio.Camera.ApplyPreset(Config.AutoPreview.cameraPreset)
+        local settings = Studio.Screenshot and Studio.Screenshot.GetCameraSettings and Studio.Screenshot.GetCameraSettings()
+        if settings then
+            Studio.Camera.SetShot(settings.preset, settings.angle, Config.Camera.transitionMs)
+        else
+            Studio.Camera.ApplyPreset(Config.AutoPreview.cameraPreset)
+        end
     end
 
     publishAutoState()
@@ -131,7 +136,12 @@ function Studio.AutoPreview.Start(startDrawable, endDrawable)
             prepareAutoLocation()
 
             if Studio.Camera then
-                Studio.Camera.ApplyPreset(Config.AutoPreview.cameraPreset, 0)
+                local settings = Studio.Screenshot and Studio.Screenshot.GetCameraSettings and Studio.Screenshot.GetCameraSettings()
+                if settings then
+                    Studio.Camera.SetShot(settings.preset, settings.angle, 0)
+                else
+                    Studio.Camera.ApplyPreset(Config.AutoPreview.cameraPreset, 0)
+                end
             end
 
             for drawable = firstDrawable, lastDrawable do

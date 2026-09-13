@@ -6,6 +6,8 @@ const closeButton = document.querySelector('#closeButton');
 const fullscreenButton = document.querySelector('#fullscreenButton');
 const windowedButton = document.querySelector('#windowedButton');
 const screenshotKeySelect = document.querySelector('#screenshotKeySelect');
+const cameraPresetSelect = document.querySelector('#cameraPresetSelect');
+const cameraAngleSelect = document.querySelector('#cameraAngleSelect');
 const packNameInput = document.querySelector('#packNameInput');
 const savePackNameButton = document.querySelector('#savePackNameButton');
 const captureButton = document.querySelector('#captureButton');
@@ -113,6 +115,13 @@ function postNui(eventName, payload = {}) {
 function action(eventName, payload = {}) {
     audioTone('press');
     return postNui(eventName, payload);
+}
+
+function sendCameraSettings() {
+    action('screenshot:camera', {
+        preset: cameraPresetSelect.value,
+        angle: cameraAngleSelect.value
+    });
 }
 
 function showToast(title, body, options = {}) {
@@ -418,6 +427,9 @@ screenshotKeySelect.addEventListener('change', () => {
     action('settings:screenshotKey', { key: screenshotKeySelect.value });
 });
 
+cameraPresetSelect.addEventListener('change', sendCameraSettings);
+cameraAngleSelect.addEventListener('change', sendCameraSettings);
+
 savePackNameButton.addEventListener('click', () => {
     packName = sanitizePackName(packNameInput.value);
     packNameInput.value = packName;
@@ -451,6 +463,8 @@ document.addEventListener('keydown', (event) => {
 });
 
 screenshotKeySelect.value = localStorage.getItem('tpmScreenshotKey') || 'F13';
+cameraPresetSelect.value = 'fullBody';
+cameraAngleSelect.value = 'front';
 packNameInput.value = packName;
 setFullscreen(isFullscreen);
 fillSlots(currentMode);

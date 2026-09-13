@@ -2,7 +2,7 @@
 
 For support contact `@el_legion` on Discord.
 
-TPM Clothing Studio Beta 0.1.3 is a FiveM developer tool for previewing clothing packs, browsing drawables and textures, switching peds, and capturing catalogue-ready screenshots with clean filenames.
+TPM Clothing Studio Beta 0.1.4 is a FiveM developer tool for previewing clothing packs, browsing drawables and textures, switching peds, and capturing catalogue-ready screenshots with clean filenames.
 
 ## Features
 
@@ -12,6 +12,8 @@ TPM Clothing Studio Beta 0.1.3 is a FiveM developer tool for previewing clothing
 - Run automatic screenshot jobs across a drawable range.
 - Capture every texture for every selected drawable.
 - Add a pack name prefix to screenshot filenames.
+- Choose screenshot camera framing: Full Body, Torso, Head, or Shoes.
+- Choose front or back screenshot angle.
 - Switch between male, female, and detected ped resources.
 - Use a polished in-game NUI built for clothing catalogue work.
 
@@ -42,7 +44,7 @@ Open the studio with `F1` or `/tpmstudio`.
 
 Use **Browser** to choose a clothing component or prop. Pick a slot, then move through drawables and textures using the buttons or number fields.
 
-Use **Screenshot** to capture the current item. Screenshots save into `resources/tpm_clothing_studio/screenshots` with structured filenames.
+Use **Screenshot** to choose the camera position and angle, then capture the current item. Screenshots save into `resources/tpm_clothing_studio/screenshots` with structured filenames. The same camera settings are used for manual and automatic screenshots.
 
 Use **Studio** for automatic screenshots. Enter the first drawable, then the last drawable. TPM Clothing Studio captures every texture for every drawable in that range.
 
@@ -78,7 +80,7 @@ By default, TPM Clothing Studio scans:
 resources/[peds]
 ```
 
-Change this in `config.lua` under `Config.Peds.scanFolder` if your server uses a different folder.
+Change this in `config.lua` under `Config.Peds.scanFolder` if your server uses a different folder. The default is `[peds]`.
 
 ## Configuration
 

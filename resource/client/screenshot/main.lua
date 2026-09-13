@@ -5,6 +5,8 @@ local lastCaptureContext = 'manual'
 local shouldReopenMenu = false
 local restoreUiAfterCapture = false
 local restoreUiVisible = false
+local cameraPreset = Config.AutoPreview.cameraPreset
+local cameraAngle = 'front'
 
 local function pad(value)
     return ('%03d'):format(value or 0)
@@ -106,6 +108,27 @@ function Studio.Screenshot.IsBusy()
     return captureInProgress
 end
 
+function Studio.Screenshot.GetCameraSettings()
+    return {
+        preset = cameraPreset,
+        angle = cameraAngle
+    }
+end
+
+function Studio.Screenshot.SetCameraSettings(preset, angle)
+    if Config.Camera.presets[preset] then
+        cameraPreset = preset
+    end
+
+    if angle == 'back' or angle == 'front' then
+        cameraAngle = angle
+    end
+
+    if Studio.Camera then
+        Studio.Camera.SetShot(cameraPreset, cameraAngle, 0)
+    end
+end
+
 function Studio.Screenshot.Capture(context)
     if captureInProgress then
         Studio.Logger.Warn('Screenshot capture already in progress.')
@@ -128,8 +151,8 @@ function Studio.Screenshot.Capture(context)
         local wasVisible = Studio.GetState('nuiVisible')
         local filename = buildFilename()
 
-        if lastCaptureContext == 'manual' and Studio.Camera then
-            Studio.Camera.ApplyPreset(Config.AutoPreview.cameraPreset, 0)
+        if Studio.Camera then
+            Studio.Camera.SetShot(cameraPreset, cameraAngle, 0)
             Wait(150)
         end
 
