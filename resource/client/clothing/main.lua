@@ -65,7 +65,7 @@ local function applyProp()
     SetPedPropIndex(ped, state.propId, state.drawable - 1, state.texture, true)
 end
 
-local function publishState()
+function Studio.Clothing.PublishState()
     local drawableCount = getDrawableCount()
     local textureCount = getTextureCount()
 
@@ -93,7 +93,7 @@ local function applyCurrent()
         applyComponent()
     end
 
-    publishState()
+    Studio.Clothing.PublishState()
 end
 
 function Studio.Clothing.GetState()
@@ -137,7 +137,7 @@ end
 
 function Studio.Clothing.SetCollection(collectionName)
     state.collection = collectionName or Config.Clothing.collections.fallback
-    publishState()
+    Studio.Clothing.PublishState()
 end
 
 function Studio.Clothing.GetComponents()
