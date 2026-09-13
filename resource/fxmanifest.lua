@@ -5,7 +5,7 @@ lua54 'yes'
 name 'TPM Clothing Studio'
 author 'TPM'
 description 'A production-focused FiveM clothing preview and capture toolkit.'
-version '0.0.5-alpha'
+version '0.0.6-alpha'
 
 ui_page 'html/index.html'
 
