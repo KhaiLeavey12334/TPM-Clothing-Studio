@@ -50,6 +50,10 @@ function Studio.Screenshot.BuildFilename()
     return buildFilename()
 end
 
+function Studio.Screenshot.IsBusy()
+    return captureInProgress
+end
+
 function Studio.Screenshot.Capture()
     if captureInProgress then
         Studio.Logger.Warn('Screenshot capture already in progress.')
